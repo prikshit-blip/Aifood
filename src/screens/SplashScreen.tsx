@@ -61,8 +61,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar
-        barStyle={themeData?.statusBarStyle || 'light-content'}
-        backgroundColor={themeData?.primaryColor || '#FF6B35'}
+        barStyle={ 'light-content'}
+        backgroundColor={themeData?.sections?.colors?.primary || '#FF6B35'}
       />
       <View style={styles.content}>
         {/* Logo/Icon */}

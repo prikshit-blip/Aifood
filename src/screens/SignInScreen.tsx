@@ -23,9 +23,8 @@ type SignInScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignI
 const SignInScreen: React.FC = () => {
   const navigation = useNavigation<SignInScreenNavigationProp>();
 
-  const [name, setName] = useState('');
+  
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,8 +32,8 @@ const SignInScreen: React.FC = () => {
   const { themeData } = useThemeContext();
   const styles = createStyles(themeData?.sections);
 
-  const handleSignUp = async () => {
-    if (!name || !email || !phone || !password) {
+  const handleSignIn = async () => {
+    if ( !email  || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
@@ -42,13 +41,12 @@ const SignInScreen: React.FC = () => {
     setIsLoading(true);
     try {
       const user = {
-        firstName: name.split(' ')[0],
-        lastName: name.split(' ')[1] || '',
+        
         email: email,
-        phone: phone,
+        password: password,
       };
 
-      navigation.navigate('Home', { user });
+      navigation.navigate('Home');
     } catch (error) {
       Alert.alert('Error', 'Sign up failed. Please try again.');
     } finally {
@@ -64,14 +62,19 @@ const SignInScreen: React.FC = () => {
     navigation.navigate('Home');
   };
 
+  const handleSignUp = () => {
+    navigation.navigate('SignUp');
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={themeData?.sections?.colors?.primary || '#FF6B35'} barStyle="light-content" />
+      <StatusBar backgroundColor={themeData?.sections?.colors?.primary || '#FF6B35'} barStyle="dark-content" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoidingView}
       >
-        {/* Header with Logo */}
+       <View style={styles.mainContainer}>
+         {/* Header with Logo */}
         <View style={styles.header}>
           <View style={styles.logoContainer}>
             <View style={styles.burgerIcon}>
@@ -84,25 +87,12 @@ const SignInScreen: React.FC = () => {
         {/* Form Section */}
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.formContainer}>
-            <Text style={styles.title}>Sign up</Text>
+            <Text style={styles.title}>Sign In</Text>
             <Text style={styles.subtitle}>
               Create your account to explore delicious meals, easy bookings, and fast deliveries — all in one place.
             </Text>
 
-            {/* Name Input */}
-            <View style={styles.inputContainer}>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>👤</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Name"
-                  placeholderTextColor="#999"
-                  value={name}
-                  onChangeText={setName}
-                  autoCapitalize="words"
-                />
-              </View>
-            </View>
+            
 
             {/* Email Input */}
             <View style={styles.inputContainer}>
@@ -121,20 +111,7 @@ const SignInScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Phone Input */}
-            <View style={styles.inputContainer}>
-              <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>📞</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Phone"
-                  placeholderTextColor="#999"
-                  value={phone}
-                  onChangeText={setPhone}
-                  keyboardType="phone-pad"
-                />
-              </View>
-            </View>
+            
 
             {/* Password Input */}
             <View style={styles.inputContainer}>
@@ -158,11 +135,11 @@ const SignInScreen: React.FC = () => {
             {/* Sign Up Button */}
             <TouchableOpacity
               style={styles.signUpButton}
-              onPress={handleSignUp}
+              onPress={handleSignIn}
               disabled={isLoading}
             >
               <Text style={styles.signUpButtonText}>
-                {isLoading ? 'SIGNING UP...' : 'SIGN UP'}
+                {isLoading ? 'SIGNING IN...' : 'SIGN IN'}
               </Text>
             </TouchableOpacity>
 
@@ -196,9 +173,9 @@ const SignInScreen: React.FC = () => {
             </View>
 
             {/* Sign In Link */}
-            <TouchableOpacity style={styles.signInLink} onPress={handleNavigateToSignIn}>
+            <TouchableOpacity style={styles.signInLink} onPress={handleSignUp}>
               <Text style={styles.signInLinkText}>
-                Already have an Account? <Text style={styles.signInLinkBold}>Sign in</Text>
+                New User <Text style={styles.signInLinkBold}>Sign Up</Text>
               </Text>
             </TouchableOpacity>
 
@@ -208,6 +185,7 @@ const SignInScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </ScrollView>
+       </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -217,14 +195,19 @@ const createStyles = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: 'red',
+      backgroundColor: '#FFFFFF',
+    },
+    mainContainer:{
+      flex: 1,
+      backgroundColor: theme?.colors?.primary || '#FF6B35',
+
     },
     keyboardAvoidingView: {
       flex: 1,
     },
     header: {
       alignItems: 'center',
-      paddingVertical: 50,
+      paddingVertical: 40,
       backgroundColor: theme?.colors?.primary || '#FF6B35',
     },
     logoContainer: {
@@ -247,7 +230,7 @@ const createStyles = (theme: any) =>
       backgroundColor: '#FFFFFF',
       borderTopLeftRadius: 25,
       borderTopRightRadius: 25,
-      marginBottom: 4,
+      marginBottom: 1,
     },
     burgerBottom: {
       width: 50,
@@ -258,29 +241,43 @@ const createStyles = (theme: any) =>
     },
     content: {
       flex: 1,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: theme?.colors?.primary || '#FFFFFF',
+      position:"absolute",
+      bottom:0,
+      left:0,
+      right:0,
     },
     formContainer: {
-      padding: 24,
-      paddingTop: 32,
+      
+      borderTopLeftRadius:24,
+      borderTopRightRadius:24,
+      paddingHorizontal: 16,
+      backgroundColor:  '#FFFFFF',
+      paddingTop: 18,
+      position:'relative',
     },
     title: {
       fontSize: 32,
       fontWeight: 'bold',
-      marginBottom: 12,
+      marginBottom: 10,
       textAlign: 'center',
-      color: '#000000',
+      position:'static',
+      top:0,
+      color: theme?.colors?.primary_text || '#000000',
     },
     subtitle: {
       fontSize: 14,
       marginBottom: 32,
       textAlign: 'center',
-      color: '#666666',
+      color: theme?.colors?.primary_text,
       lineHeight: 20,
       paddingHorizontal: 10,
+
     },
     inputContainer: {
       marginBottom: 16,
+      textAlignVertical:'center',
+      
     },
     inputWrapper: {
       flexDirection: 'row',
@@ -300,6 +297,7 @@ const createStyles = (theme: any) =>
       paddingVertical: 16,
       fontSize: 16,
       color: '#000000',
+      textAlignVertical:'center',
     },
     eyeIcon: {
       padding: 4,
@@ -310,21 +308,26 @@ const createStyles = (theme: any) =>
     signUpButton: {
       backgroundColor: '#000000',
       borderRadius: 12,
-      paddingVertical: 18,
+      // paddingVertical: 18,
       alignItems: 'center',
+      justifyContent:'center',
       marginTop: 8,
-      marginBottom: 24,
+      marginBottom: 8,
+      height:50,
+
     },
     signUpButtonText: {
       color: '#FFFFFF',
-      fontSize: 24,
+      fontSize: 18,
       fontWeight: 'bold',
       letterSpacing: 1,
     },
     dividerContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginVertical: 24,
+      marginBottom:12,
+
+      
     },
     dividerLine: {
       flex: 1,
@@ -344,8 +347,8 @@ const createStyles = (theme: any) =>
       marginBottom: 32,
     },
     socialButton: {
-      width: 64,
-      height: 64,
+      width: 50,
+      height: 50,
       borderRadius: 12,
       borderWidth: 1,
       borderColor: '#E0E0E0',

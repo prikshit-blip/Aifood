@@ -10,93 +10,45 @@ import {
   Platform,
   ScrollView,
   Image,
+  StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
-import { TENANT_CONFIGS, TenantConfig } from '../config/tenantConfig';
 import { RootStackParamList } from '../navigation/types';
+import { useThemeContext } from '../contexts/ThemeContext';
 
-type SignUpScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
-type SignUpScreenRouteProp = RouteProp<RootStackParamList, 'SignUp'>;
+type SignInScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignIn'>;
 
-interface SignUpScreenProps {
-  navigation: SignUpScreenNavigationProp;
-  route: SignUpScreenRouteProp;
-}
+const SignUpScreen: React.FC = () => {
+  const navigation = useNavigation<SignInScreenNavigationProp>();
 
-interface SignUpData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phoneNumber: string;
-}
-
-const SignUpScreen: React.FC<SignUpScreenProps> = ({
-  navigation,
-  route,
-}) => {
-  const { tenant } = route.params;
-  const [formData, setFormData] = useState<SignUpData>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phoneNumber: '',
-  });
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
 
-  const handleInputChange = (field: keyof SignUpData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const validateForm = (): boolean => {
-    const { firstName, lastName, email, password, confirmPassword, phoneNumber } = formData;
-
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all required fields');
-      return false;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return false;
-    }
-
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long');
-      return false;
-    }
-
-    if (!acceptTerms) {
-      Alert.alert('Error', 'Please accept the terms and conditions');
-      return false;
-    }
-
-    return true;
-  };
+  const { themeData } = useThemeContext();
+  const styles = createStyles(themeData?.sections);
 
   const handleSignUp = async () => {
-    if (!validateForm()) return;
+    if (!name || !email || !phone || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate successful sign up
       const user = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
+        firstName: name.split(' ')[0],
+        lastName: name.split(' ')[1] || '',
+        email: email,
+        phone: phone,
       };
-      
-      navigation.navigate('Home', { tenant, user });
+
+      navigation.navigate('Home');
     } catch (error) {
       Alert.alert('Error', 'Sign up failed. Please try again.');
     } finally {
@@ -105,329 +57,351 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({
   };
 
   const handleNavigateToSignIn = () => {
-    navigation.navigate('SignIn', { tenant });
+    navigation.navigate('SignIn');
   };
 
-  const tenantBranding = {
-    primaryColor: tenant.primaryColor,
-    secondaryColor: tenant.secondaryColor,
-    backgroundColor: tenant.backgroundColor,
-    textColor: tenant.textColor,
+  const handleSkip = () => {
+    navigation.navigate('Home');
   };
-
-  const dynamicStyles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: tenantBranding.backgroundColor,
-    },
-    header: {
-      backgroundColor: tenantBranding.primaryColor,
-      paddingVertical: 20,
-      alignItems: 'center',
-    },
-    logo: {
-      width: 80,
-      height: 80,
-      borderRadius: 40,
-      backgroundColor: tenantBranding.backgroundColor,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginBottom: 10,
-    },
-    logoText: {
-      fontSize: 32,
-      fontWeight: 'bold',
-      color: tenantBranding.primaryColor,
-    },
-    tenantName: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: tenantBranding.backgroundColor,
-      marginBottom: 5,
-    },
-    tenantDescription: {
-      fontSize: 14,
-      color: tenantBranding.backgroundColor,
-      opacity: 0.9,
-    },
-    signUpButton: {
-      backgroundColor: tenantBranding.primaryColor,
-    },
-    signInButton: {
-      borderColor: tenantBranding.primaryColor,
-      borderWidth: 1,
-    },
-    signInButtonText: {
-      color: tenantBranding.primaryColor,
-    },
-  });
 
   return (
-    <SafeAreaView style={dynamicStyles.container}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor={themeData?.sections?.colors?.primary || '#FF6B35'} barStyle="light-content" />
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoidingView}
       >
-        {/* Header with Tenant Info */}
-        <View style={dynamicStyles.header}>
-          {tenant.logo ? (
-            <Image
-              source={{ uri: tenant.logo }}
-              style={dynamicStyles.logo}
-              resizeMode="contain"
-            />
-          ) : (
-            <View style={dynamicStyles.logo}>
-              <Text style={dynamicStyles.logoText}>
-                {tenant.icon || '🍽️'}
-              </Text>
+       <View style={styles.mainContainer}>
+         {/* Header with Logo */}
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <View style={styles.burgerIcon}>
+              <View style={styles.burgerTop} />
+              <View style={styles.burgerBottom} />
             </View>
-          )}
-          <Text style={dynamicStyles.tenantName}>
-            {tenant.name}
-          </Text>
-          <Text style={dynamicStyles.tenantDescription}>
-            {tenant.description}
-          </Text>
+          </View>
         </View>
 
+        {/* Form Section */}
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.formContainer}>
-            <Text style={[styles.title, { color: tenantBranding.textColor }]}>
-              Create Account
-            </Text>
-            <Text style={[styles.subtitle, { color: tenantBranding.textColor }]}>
-              Join {tenant.name} today
+            <Text style={styles.title}>Sign Up</Text>
+            <Text style={styles.subtitle}>
+              Create your account to explore delicious meals, easy bookings, and fast deliveries — all in one place.
             </Text>
 
-            {/* Name Fields */}
-            <View style={styles.row}>
-              <View style={[styles.inputContainer, styles.halfWidth]}>
-                <Text style={[styles.label, { color: tenantBranding.textColor }]}>
-                  First Name *
-                </Text>
+            {/* Name Input */}
+            <View style={styles.inputContainer}>
+              <View style={styles.inputWrapper}>
+                <Text style={styles.inputIcon}>👤</Text>
                 <TextInput
-                  style={[styles.input, { borderColor: tenantBranding.primaryColor }]}
-                  placeholder="First name"
+                  style={styles.input}
+                  placeholder="Name"
                   placeholderTextColor="#999"
-                  value={formData.firstName}
-                  onChangeText={(value) => handleInputChange('firstName', value)}
-                  autoCapitalize="words"
-                />
-              </View>
-              <View style={[styles.inputContainer, styles.halfWidth]}>
-                <Text style={[styles.label, { color: tenantBranding.textColor }]}>
-                  Last Name *
-                </Text>
-                <TextInput
-                  style={[styles.input, { borderColor: tenantBranding.primaryColor }]}
-                  placeholder="Last name"
-                  placeholderTextColor="#999"
-                  value={formData.lastName}
-                  onChangeText={(value) => handleInputChange('lastName', value)}
+                  value={name}
+                  onChangeText={setName}
                   autoCapitalize="words"
                 />
               </View>
             </View>
 
+            {/* Email Input */}
             <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: tenantBranding.textColor }]}>
-                Email Address *
-              </Text>
-              <TextInput
-                style={[styles.input, { borderColor: tenantBranding.primaryColor }]}
-                placeholder="Enter your email"
-                placeholderTextColor="#999"
-                value={formData.email}
-                onChangeText={(value) => handleInputChange('email', value)}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: tenantBranding.textColor }]}>
-                Phone Number
-              </Text>
-              <TextInput
-                style={[styles.input, { borderColor: tenantBranding.primaryColor }]}
-                placeholder="Enter your phone number"
-                placeholderTextColor="#999"
-                value={formData.phoneNumber}
-                onChangeText={(value) => handleInputChange('phoneNumber', value)}
-                keyboardType="phone-pad"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: tenantBranding.textColor }]}>
-                Password *
-              </Text>
-              <TextInput
-                style={[styles.input, { borderColor: tenantBranding.primaryColor }]}
-                placeholder="Create a password"
-                placeholderTextColor="#999"
-                value={formData.password}
-                onChangeText={(value) => handleInputChange('password', value)}
-                secureTextEntry
-                autoCapitalize="none"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: tenantBranding.textColor }]}>
-                Confirm Password *
-              </Text>
-              <TextInput
-                style={[styles.input, { borderColor: tenantBranding.primaryColor }]}
-                placeholder="Confirm your password"
-                placeholderTextColor="#999"
-                value={formData.confirmPassword}
-                onChangeText={(value) => handleInputChange('confirmPassword', value)}
-                secureTextEntry
-                autoCapitalize="none"
-              />
-            </View>
-
-            {/* Terms and Conditions */}
-            <TouchableOpacity
-              style={styles.termsContainer}
-              onPress={() => setAcceptTerms(!acceptTerms)}
-            >
-              <View style={[styles.checkbox, acceptTerms && { backgroundColor: tenantBranding.primaryColor }]}>
-                {acceptTerms && <Text style={styles.checkmark}>✓</Text>}
+              <View style={styles.inputWrapper}>
+                <Text style={styles.inputIcon}>✉️</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  placeholderTextColor="#999"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
               </View>
-              <Text style={[styles.termsText, { color: tenantBranding.textColor }]}>
-                I agree to the Terms and Conditions and Privacy Policy
-              </Text>
-            </TouchableOpacity>
+            </View>
 
+            {/* Phone Input */}
+            <View style={styles.inputContainer}>
+              <View style={styles.inputWrapper}>
+                <Text style={styles.inputIcon}>📞</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Phone"
+                  placeholderTextColor="#999"
+                  value={phone}
+                  onChangeText={setPhone}
+                  keyboardType="phone-pad"
+                />
+              </View>
+            </View>
+
+            {/* Password Input */}
+            <View style={styles.inputContainer}>
+              <View style={styles.inputWrapper}>
+                <Text style={styles.inputIcon}>🔒</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  placeholderTextColor="#999"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                  <Text style={styles.eyeIconText}>{showPassword ? '👁️' : '👁️'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Sign Up Button */}
             <TouchableOpacity
-              style={[styles.signUpButton, dynamicStyles.signUpButton]}
+              style={styles.signUpButton}
               onPress={handleSignUp}
               disabled={isLoading}
             >
               <Text style={styles.signUpButtonText}>
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoading ? 'SIGNING UP...' : 'SIGN UP'}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.signInButton, dynamicStyles.signInButton]}
-              onPress={handleNavigateToSignIn}
-            >
-              <Text style={[styles.signInButtonText, dynamicStyles.signInButtonText]}>
-                Already have an account? Sign In
+            {/* OR Divider */}
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* Social Login Buttons */}
+            <View style={styles.socialContainer}>
+              <TouchableOpacity style={styles.socialButton}>
+                <Image
+                  source={{ uri: 'https://www.google.com/favicon.ico' }}
+                  style={styles.socialIcon}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <Image
+                  source={{ uri: 'https://www.facebook.com/favicon.ico' }}
+                  style={styles.socialIcon}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <Image
+                  source={{ uri: 'https://www.apple.com/favicon.ico' }}
+                  style={styles.socialIcon}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Sign In Link */}
+            <TouchableOpacity style={styles.signInLink} onPress={handleNavigateToSignIn}>
+              <Text style={styles.signInLinkText}>
+                Already have an Account? <Text style={styles.signInLinkBold}>Sign in</Text>
               </Text>
+            </TouchableOpacity>
+
+            {/* Skip Button */}
+            <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+              <Text style={styles.skipButtonText}>Skip for Now</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
+       </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-  },
-  formContainer: {
-    padding: 20,
-    paddingTop: 30,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 30,
-    textAlign: 'center',
-    opacity: 0.7,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  halfWidth: {
-    width: '48%',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    backgroundColor: '#F8F9FA',
-  },
-  termsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: '#DDD',
-    borderRadius: 4,
-    marginRight: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkmark: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  termsText: {
-    flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  signUpButton: {
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
+const createStyles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: '#FFFFFF',
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  signUpButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  signInButton: {
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  signInButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+    mainContainer:{
+      flex: 1,
+      backgroundColor: theme?.colors?.primary || '#FF6B35',
+
+    },
+    keyboardAvoidingView: {
+      flex: 1,
+    },
+    header: {
+      alignItems: 'center',
+      paddingVertical: 40,
+      backgroundColor: theme?.colors?.primary || '#FF6B35',
+    },
+    logoContainer: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    burgerIcon: {
+      width: 50,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    burgerTop: {
+      width: 50,
+      height: 20,
+      backgroundColor: '#FFFFFF',
+      borderTopLeftRadius: 25,
+      borderTopRightRadius: 25,
+      marginBottom: 1,
+    },
+    burgerBottom: {
+      width: 50,
+      height: 20,
+      backgroundColor: '#FFFFFF',
+      borderBottomLeftRadius: 25,
+      borderBottomRightRadius: 25,
+    },
+    content: {
+      flex: 1,
+      backgroundColor: theme?.colors?.primary || '#FFFFFF',
+      position:"absolute",
+      bottom:0,
+      left:0,
+      right:0,
+    },
+    formContainer: {
+      
+      borderTopLeftRadius:24,
+      borderTopRightRadius:24,
+      paddingHorizontal: 16,
+      backgroundColor:  '#FFFFFF',
+      paddingTop: 10,
+      position:'relative',
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      marginBottom: 10,
+      textAlign: 'center',
+      position:'static',
+      top:0,
+      color: theme?.colors?.primary_text || '#000000',
+    },
+    subtitle: {
+      fontSize: 14,
+      marginBottom: 32,
+      textAlign: 'center',
+      color: theme?.colors?.primary_text,
+      lineHeight: 20,
+      paddingHorizontal: 10,
+
+    },
+    inputContainer: {
+      marginBottom: 16,
+      textAlignVertical:'center',
+      
+    },
+    inputWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#E0E0E0',
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      backgroundColor: '#F8F9FA',
+    },
+    inputIcon: {
+      fontSize: 20,
+      marginRight: 12,
+    },
+    input: {
+      flex: 1,
+      paddingVertical: 16,
+      fontSize: 16,
+      color: '#000000',
+      textAlignVertical:'center',
+    },
+    eyeIcon: {
+      padding: 4,
+    },
+    eyeIconText: {
+      fontSize: 20,
+    },
+    signUpButton: {
+      backgroundColor: '#000000',
+      borderRadius: 12,
+      paddingVertical: 18,
+      alignItems: 'center',
+      marginTop: 8,
+      marginBottom: 8,
+    },
+    signUpButtonText: {
+      color: '#FFFFFF',
+      fontSize: 24,
+      fontWeight: 'bold',
+      letterSpacing: 1,
+    },
+    dividerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom:12,
+
+      
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: '#E0E0E0',
+    },
+    dividerText: {
+      marginHorizontal: 16,
+      color: '#999999',
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    socialContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 16,
+      marginBottom: 32,
+    },
+    socialButton: {
+      width: 64,
+      height: 64,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: '#E0E0E0',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#FFFFFF',
+    },
+    socialIcon: {
+      width: 32,
+      height: 32,
+    },
+    signInLink: {
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    signInLinkText: {
+      fontSize: 14,
+      color: '#666666',
+    },
+    signInLinkBold: {
+      fontWeight: 'bold',
+      color: '#000000',
+    },
+    skipButton: {
+      alignItems: 'center',
+      paddingVertical: 12,
+    },
+    skipButtonText: {
+      fontSize: 14,
+      color: '#666666',
+      fontWeight: '500',
+    },
+  });
 
 export default SignUpScreen;
