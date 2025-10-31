@@ -1,5 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme, getStoredTheme } from '../api/theme/useTheme';
+import { normalizeTheme, NormalizedTheme } from './themeFormatter';
+
+// Re-export NormalizedTheme for easier imports
+export type { NormalizedTheme } from './themeFormatter';
 
 // Theme Data Types
 export interface ThemeData {
@@ -88,7 +93,12 @@ interface ButtonConfig {
 }
 
 interface ThemeContextType {
+  // Original nested theme data
   themeData: ThemeData | null;
+  
+  // ✅ Normalized theme - Easy to use in screens!
+  theme: NormalizedTheme | null;
+  
   loading: boolean;
   error: string | null;
   setThemeData: (data: ThemeData) => Promise<void>;
@@ -109,7 +119,7 @@ const DEFAULT_THEME: ThemeData = {
   },
   sections: {
     colors: {
-      primary: '#ff0000',
+      primary: '#FF0000',
       box_text: '#FFFFFF',
       background: '#121212',
       primary_text: '#000000',
@@ -150,7 +160,7 @@ const DEFAULT_THEME: ThemeData = {
     buttons: {
       primary_button: {
         text: 'Order Now',
-        background: '#ff0000',
+        background: '#FF0000',
         text_color: '#FFFFFF',
       },
       secondary_button: {
@@ -195,37 +205,76 @@ const DEFAULT_THEME: ThemeData = {
 interface ThemeProviderProps {
   children: ReactNode;
   tenantId?: string;
+  domain?: string; // Domain for theme API (e.g., 'demo.theaihostess.com')
 }
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, tenantId }) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ 
+  children, 
+  tenantId,
+  domain = 'demo.theaihostess.com', // Default domain, will be auto-detected later
+}) => {
   const [themeData, setThemeDataState] = useState<ThemeData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch theme from API using React Query
+  const { 
+    data: apiThemeData, 
+    isLoading: isFetchingTheme, 
+    error: themeError,
+    refetch: refetchTheme 
+  } = useTheme(domain, true); // enabled: true - fetch immediately
+
+  // Load cached theme on mount for instant display
   useEffect(() => {
-    loadThemeFromStorage();
-  }, [tenantId]);
-
-  const loadThemeFromStorage = async () => {
-    try {
-      setLoading(true);
-      const storageKey = tenantId ? `${THEME_STORAGE_KEY}_${tenantId}` : THEME_STORAGE_KEY;
-      const storedTheme = await AsyncStorage.getItem(storageKey);
-
-      if (storedTheme) {
-        setThemeDataState(JSON.parse(storedTheme));
-      } else {
-        // ✅ Set default theme if no theme stored
-        await AsyncStorage.setItem(storageKey, JSON.stringify(DEFAULT_THEME));
+    const loadCachedTheme = async () => {
+      try {
+        setInitialLoading(true);
+        
+        // First, try to load from AsyncStorage for instant display
+        const cachedTheme = await getStoredTheme(domain);
+        
+        if (cachedTheme) {
+          setThemeDataState(cachedTheme);
+        } else {
+          // Fallback to default theme if nothing cached
+          setThemeDataState(DEFAULT_THEME);
+        }
+      } catch (err) {
+        console.error('Error loading cached theme:', err);
         setThemeDataState(DEFAULT_THEME);
+      } finally {
+        setInitialLoading(false);
       }
-    } catch (err) {
-      setError('Failed to load theme');
-      console.error('Theme load error:', err);
-    } finally {
-      setLoading(false);
+    };
+
+    loadCachedTheme();
+  }, [domain]);
+
+  // Update theme data when API fetch completes
+  useEffect(() => {
+    if (apiThemeData) {
+      setThemeDataState(apiThemeData);
+      setError(null);
     }
-  };
+  }, [apiThemeData]);
+
+  // Handle API errors
+  useEffect(() => {
+    if (themeError) {
+      setError('Failed to fetch theme from API');
+      console.error('Theme API error:', themeError);
+      // Keep using cached/default theme on error
+    }
+  }, [themeError]);
+
+  // Combined loading state
+  const loading = initialLoading || isFetchingTheme;
+
+  // ✅ Normalize theme data for easy access
+  const normalizedTheme = useMemo(() => {
+    return normalizeTheme(themeData);
+  }, [themeData]);
 
   const setThemeData = async (data: ThemeData) => {
     try {
@@ -250,13 +299,23 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, tenantId
   };
 
   const refreshTheme = async () => {
-    await loadThemeFromStorage();
+    try {
+      const result = await refetchTheme();
+      if (result.data) {
+        setThemeDataState(result.data);
+        setError(null);
+      }
+    } catch (err) {
+      setError('Failed to refresh theme');
+      console.error('Theme refresh error:', err);
+    }
   };
 
   return (
     <ThemeContext.Provider
       value={{
-        themeData,
+        themeData,        // Original nested structure (for compatibility)
+        theme: normalizedTheme, // ✅ Normalized easy-to-use structure
         loading,
         error,
         setThemeData,

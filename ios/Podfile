@@ -30,5 +30,40 @@ target 'Aifood' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    
+    # ✅ iOS Build Optimizations for Smaller IPA Size
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        if config.name == 'Release'
+          # ✅ Enable aggressive optimization
+          config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-O'
+          config.build_settings['GCC_OPTIMIZATION_LEVEL'] = 's' # Size optimization
+          
+          # ✅ Strip debug symbols
+          config.build_settings['STRIP_INSTALLED_PRODUCT'] = 'YES'
+          config.build_settings['DEPLOYMENT_POSTPROCESSING'] = 'YES'
+          config.build_settings['COPY_PHASE_STRIP'] = 'YES'
+          
+          # ✅ Remove unused code
+          config.build_settings['DEAD_CODE_STRIPPING'] = 'YES'
+          
+          # ✅ Compress PNGs
+          config.build_settings['COMPRESS_PNG_FILES'] = 'YES'
+          
+          # ✅ Single architecture for release (if needed)
+          # config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+        end
+      end
+    end
+    
+    # ✅ Optimize main app target
+    installer.aggregate_targets.each do |target|
+      target.xcconfigs.each do |config_name, config_file|
+        if config_name.include?('Release')
+          config_file.attributes['SWIFT_OPTIMIZATION_LEVEL'] = '-O'
+          config_file.attributes['GCC_OPTIMIZATION_LEVEL'] = 's'
+        end
+      end
+    end
   end
 end

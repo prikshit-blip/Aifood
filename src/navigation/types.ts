@@ -1,17 +1,10 @@
 // Navigation types for the entire app
 export type RootStackParamList = {
   Splash: undefined;
-  TenantSelector: undefined;
-  SignIn: { tenant: TenantConfig };
-  SignUp: { tenant: TenantConfig };
-  Home: { 
-    tenant: TenantConfig;
-    user: {
-      firstName: string;
-      lastName: string;
-      email: string;
-    };
-  };
+  Onboarding: undefined;
+  SignIn: undefined;
+  SignUp: undefined;
+  Home: undefined;
 };
 
 // Navigation prop types
@@ -22,11 +15,6 @@ export type RouteProp<T extends keyof RootStackParamList> = import('@react-navig
 export type SplashScreenProps = {
   navigation: NavigationProp;
   route: RouteProp<'Splash'>;
-};
-
-export type TenantSelectorScreenProps = {
-  navigation: NavigationProp;
-  route: RouteProp<'TenantSelector'>;
 };
 
 export type SignInScreenProps = {
@@ -44,5 +32,4 @@ export type HomeScreenProps = {
   route: RouteProp<'Home'>;
 };
 
-// Import TenantConfig for type definitions
-import { TenantConfig } from '../config/tenantConfig';
+// Note: SignUp route does not accept params

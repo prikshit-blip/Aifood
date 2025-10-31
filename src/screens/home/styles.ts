@@ -1,0 +1,198 @@
+import { StyleSheet } from 'react-native';
+
+const createStyles = (theme: any) =>
+  
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    header: {
+      backgroundColor: theme.primaryColor,
+      paddingVertical: 20,
+      paddingHorizontal: 20,
+    },
+    headerContent: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    headerLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    headerText: {
+      marginLeft: 15,
+    },
+    logo: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      backgroundColor: theme.backgroundColor,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    logoText: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: theme.primaryColor,
+    },
+    welcomeText: {
+      color: theme.textOnPrimary || '#FFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    userName: {
+      color: theme.textOnPrimary || '#FFF',
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginTop: 4,
+    },
+    tabContainer: {
+      flexDirection: 'row',
+      backgroundColor: theme.tabBackground || '#F8F9FA',
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+    },
+    tabButton: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 8,
+      marginHorizontal: 5,
+      alignItems: 'center',
+    },
+    tabButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    content: { flex: 1 },
+    dashboardContainer: { padding: 20 },
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 15,
+      color: theme.textColor,
+    },
+    statsContainer: { marginBottom: 30 },
+    statsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 15,
+    },
+    statCard: {
+      flex: 1,
+      backgroundColor: theme.cardBackground || '#FFFFFF',
+      padding: 20,
+      borderRadius: 12,
+      alignItems: 'center',
+      marginHorizontal: 5,
+      borderWidth: 2,
+      shadowColor: '#000',
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    statNumber: { fontSize: 24, fontWeight: 'bold', marginBottom: 5 },
+    statLabel: { fontSize: 14, color: theme.textColor },
+    featuresContainer: { marginBottom: 30 },
+    featureCard: {
+      flexDirection: 'row',
+      backgroundColor: theme.cardBackground || '#FFFFFF',
+      padding: 15,
+      borderRadius: 12,
+      marginBottom: 10,
+      borderLeftWidth: 4,
+      elevation: 3,
+    },
+    featureIcon: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 15,
+    },
+    featureIconText: { fontSize: 24 },
+    featureTitle: { fontSize: 16, fontWeight: 'bold', color: theme.textColor },
+    featureDescription: { fontSize: 14, opacity: 0.7, color: theme.textColor },
+    activityContainer: { marginBottom: 30 },
+    activityList: {
+      backgroundColor: theme.cardBackground || '#FFFFFF',
+      borderRadius: 12,
+      padding: 15,
+    },
+    activityItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: '#F0F0F0',
+    },
+    activityDot: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      marginRight: 15,
+    },
+    activityContent: { flex: 1 },
+    activityTitle: { fontSize: 16, fontWeight: '600', color: theme.textColor },
+    activityTime: { fontSize: 12, opacity: 0.6, color: theme.textColor },
+    profileContainer: { padding: 20 },
+    profileHeader: { alignItems: 'center', marginBottom: 30 },
+    profileLogo: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      marginBottom: 15,
+    },
+    profileLogoText: { fontSize: 40, color: theme.primary_text },
+    profileName: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 5,
+      color: theme.textColor,
+    },
+    profileDescription: {
+      fontSize: 16,
+      opacity: 0.7,
+      textAlign: 'center',
+      color: theme.textColor,
+    },
+    userInfo: {
+      backgroundColor: theme.cardBackground || '#FFFFFF',
+      borderRadius: 12,
+      padding: 20,
+      marginBottom: 30,
+    },
+    userInfoTitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 15,
+      color: theme.textColor,
+    },
+    userInfoItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: '#F0F0F0',
+    },
+    userInfoLabel: { fontSize: 16, fontWeight: '600', color: theme.textColor },
+    userInfoValue: { fontSize: 16, textAlign: 'right', color: theme.textColor },
+    signOutButton: {
+      backgroundColor: '#FF4444',
+      borderRadius: 12,
+      paddingVertical: 16,
+      alignItems: 'center',
+    },
+    signOutButtonText: {
+      color: '#FFFFFF',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+  });
+
+export default createStyles;
+
+

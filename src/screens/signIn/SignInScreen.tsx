@@ -1,0 +1,192 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Image,
+  StatusBar,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../navigation/types';
+import { useThemeContext } from '../../contexts/ThemeContext';
+import createStyles from './styles';
+
+type SignInScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignIn'>;
+
+const SignInScreen: React.FC = () => {
+  const navigation = useNavigation<SignInScreenNavigationProp>();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { themeData } = useThemeContext();
+  const styles = createStyles(themeData?.sections);
+
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const user = {
+        email: email,
+        password: password,
+      };
+
+      navigation.navigate({ name: 'Home', params: undefined });
+    } catch (error) {
+      Alert.alert('Error', 'Sign up failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSkip = () => {
+    navigation.navigate({ name: 'Home', params: undefined });
+  };
+
+  const handleSignUp = () => {
+    navigation.navigate({ name: 'SignUp', params: undefined });
+  };
+
+  const primaryColor = themeData?.sections?.colors?.primary || '#FF6B35';
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={primaryColor}
+      />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.mainContainer}>
+          {/* Header with Logo */}
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <View style={styles.burgerIcon}>
+                <View style={styles.burgerTop} />
+                <View style={styles.burgerBottom} />
+              </View>
+            </View>
+          </View>
+
+          {/* Form Section */}
+          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            <View style={styles.formContainer}>
+              <Text style={styles.title}>Sign In</Text>
+              <Text style={styles.subtitle}>
+                Create your account to explore delicious meals, easy bookings, and fast deliveries — all in one place.
+              </Text>
+
+              {/* Email Input */}
+              <View style={styles.inputContainer}>
+                <View style={styles.inputWrapper}>
+                  <Text style={styles.inputIcon}>✉️</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    placeholderTextColor="#999"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+              </View>
+
+              {/* Password Input */}
+              <View style={styles.inputContainer}>
+                <View style={styles.inputWrapper}>
+                  <Text style={styles.inputIcon}>🔒</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    placeholderTextColor="#999"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                    <Text style={styles.eyeIconText}>{showPassword ? '👁️' : '👁️'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Sign Up Button */}
+              <TouchableOpacity
+                style={styles.signUpButton}
+                onPress={handleSignIn}
+                disabled={isLoading}
+              >
+                <Text style={styles.signUpButtonText}>
+                  {isLoading ? 'SIGNING IN...' : 'SIGN IN'}
+                </Text>
+              </TouchableOpacity>
+
+              {/* OR Divider */}
+              <View style={styles.dividerContainer}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.dividerLine} />
+              </View>
+
+              {/* Social Login Buttons */}
+              <View style={styles.socialContainer}>
+                <TouchableOpacity style={styles.socialButton}>
+                  <Image
+                    source={{ uri: 'https://www.google.com/favicon.ico' }}
+                    style={styles.socialIcon}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.socialButton}>
+                  <Image
+                    source={{ uri: 'https://www.facebook.com/favicon.ico' }}
+                    style={styles.socialIcon}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.socialButton}>
+                  <Image
+                    source={{ uri: 'https://www.apple.com/favicon.ico' }}
+                    style={styles.socialIcon}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              {/* Sign In Link */}
+              <TouchableOpacity style={styles.signInLink} onPress={handleSignUp}>
+                <Text style={styles.signInLinkText}>
+                  New User <Text style={styles.signInLinkBold}>Sign Up</Text>
+                </Text>
+              </TouchableOpacity>
+
+              {/* Skip Button */}
+              <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+                <Text style={styles.skipButtonText}>Skip for Now</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+export default SignInScreen;
+
+

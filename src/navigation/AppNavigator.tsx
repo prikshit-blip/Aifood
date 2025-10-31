@@ -6,8 +6,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Import screens
 import SplashScreen from '../screens/SplashScreen';
-import TenantSelector from '../components/TenantSelector';
 import SignInScreen from '../screens/SignInScreen';
+import OnboardingScreen from '../screens/OnboardingScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import HomeScreen from '../screens/HomeScreen';
 
@@ -17,17 +17,10 @@ import { TenantConfig } from '../config/tenantConfig';
 // Navigation types
 export type RootStackParamList = {
   Splash: undefined;
-  TenantSelector: undefined;
-  SignIn: { tenant: TenantConfig };
+  Onboarding: undefined;
+  SignIn: undefined;
   SignUp: { tenant: TenantConfig };
-  Home: { 
-    tenant: TenantConfig;
-    user: {
-      firstName: string;
-      lastName: string;
-      email: string;
-    };
-  };
+  Home: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -61,6 +54,13 @@ const AppNavigator: React.FC = () => {
           <Stack.Screen 
             name="Splash" 
             component={SplashScreen}
+            options={{
+              gestureEnabled: false,
+            }}
+          />
+          <Stack.Screen 
+            name="Onboarding" 
+            component={OnboardingScreen}
             options={{
               gestureEnabled: false,
             }}
