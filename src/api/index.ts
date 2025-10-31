@@ -16,5 +16,4 @@ export * from './auth/useAuth';
 
 // Theme
 export * from './theme/themeApi';
-export * from './theme/useTheme';
 

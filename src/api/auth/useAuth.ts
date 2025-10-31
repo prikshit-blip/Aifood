@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuthStore } from '../../store/stores/authStore';
+import { useUserStore } from '../../store/stores/userStore';
 import {
   signInApi,
   signUpApi,
@@ -7,20 +8,14 @@ import {
   signOutApi,
 } from './authApi';
 import type { SignInRequest, SignUpRequest, User } from '../types';
+import { logger } from '../../utils/logger';
 
 const AUTH_KEYS = {
   user: ['auth', 'user'] as const,
   currentUser: ['auth', 'currentUser'] as const,
 };
 
-// Storage keys
-const STORAGE_KEYS = {
-  authToken: '@auth_token',
-  userData: '@user_data',
-  refreshToken: '@refresh_token',
-};
-
-// Sign In Hook
+// Sign In Hook (React Query + Zustand)
 export const useSignIn = () => {
   const queryClient = useQueryClient();
 
@@ -28,13 +23,23 @@ export const useSignIn = () => {
     mutationFn: async (credentials: SignInRequest) => {
       const response = await signInApi(credentials);
       
-      // Save token and user data to storage
-      await AsyncStorage.setItem(STORAGE_KEYS.authToken, response.token);
-      await AsyncStorage.setItem(STORAGE_KEYS.userData, JSON.stringify(response.user));
+      // ✅ Use Zustand stores instead of AsyncStorage
+      useAuthStore.getState().login(
+        response.token,
+        response.refreshToken || '',
+        3600 // 1 hour expiry (adjust based on your API)
+      );
       
-      if (response.refreshToken) {
-        await AsyncStorage.setItem(STORAGE_KEYS.refreshToken, response.refreshToken);
-      }
+      useUserStore.getState().setUser({
+        id: response.user.id,
+        email: response.user.email,
+        name: `${response.user.firstName} ${response.user.lastName}`,
+        phone: response.user.phone,
+        avatar: response.user.avatar,
+        role: 'customer',
+      });
+      
+      logger.event('user_signed_in', { userId: response.user.id });
       
       return response;
     },
@@ -44,12 +49,12 @@ export const useSignIn = () => {
       queryClient.setQueryData<User>(AUTH_KEYS.currentUser, data.user);
     },
     onError: (error) => {
-      console.error('Sign in error:', error);
+      logger.error('Sign in failed', error);
     },
   });
 };
 
-// Sign Up Hook
+// Sign Up Hook (React Query + Zustand)
 export const useSignUp = () => {
   const queryClient = useQueryClient();
 
@@ -57,13 +62,23 @@ export const useSignUp = () => {
     mutationFn: async (data: SignUpRequest) => {
       const response = await signUpApi(data);
       
-      // Save token and user data to storage
-      await AsyncStorage.setItem(STORAGE_KEYS.authToken, response.token);
-      await AsyncStorage.setItem(STORAGE_KEYS.userData, JSON.stringify(response.user));
+      // ✅ Use Zustand stores instead of AsyncStorage
+      useAuthStore.getState().login(
+        response.token,
+        response.refreshToken || '',
+        3600
+      );
       
-      if (response.refreshToken) {
-        await AsyncStorage.setItem(STORAGE_KEYS.refreshToken, response.refreshToken);
-      }
+      useUserStore.getState().setUser({
+        id: response.user.id,
+        email: response.user.email,
+        name: `${response.user.firstName} ${response.user.lastName}`,
+        phone: response.user.phone,
+        avatar: response.user.avatar,
+        role: 'customer',
+      });
+      
+      logger.event('user_signed_up', { userId: response.user.id });
       
       return response;
     },
@@ -73,7 +88,7 @@ export const useSignUp = () => {
       queryClient.setQueryData<User>(AUTH_KEYS.currentUser, data.user);
     },
     onError: (error) => {
-      console.error('Sign up error:', error);
+      logger.error('Sign up failed', error);
     },
   });
 };
@@ -85,8 +100,14 @@ export const useCurrentUser = (enabled: boolean = true) => {
     queryFn: async () => {
       const response = await getCurrentUserApi();
       
-      // Update storage with latest user data
-      await AsyncStorage.setItem(STORAGE_KEYS.userData, JSON.stringify(response));
+      // ✅ Update Zustand store instead of AsyncStorage
+      useUserStore.getState().updateUser({
+        id: response.id,
+        email: response.email,
+        name: `${response.firstName} ${response.lastName}`,
+        phone: response.phone,
+        avatar: response.avatar,
+      });
       
       return response;
     },
@@ -106,15 +127,14 @@ export const useSignOut = () => {
         await signOutApi();
       } catch (error) {
         // Even if API call fails, clear local data
-        console.error('Sign out API error:', error);
+        logger.error('Sign out API error', error);
       }
       
-      // Clear storage
-      await AsyncStorage.multiRemove([
-        STORAGE_KEYS.authToken,
-        STORAGE_KEYS.userData,
-        STORAGE_KEYS.refreshToken,
-      ]);
+      // ✅ Clear Zustand stores instead of AsyncStorage
+      useAuthStore.getState().logout();
+      useUserStore.getState().clearUser();
+      
+      logger.event('user_signed_out');
     },
     onSuccess: () => {
       // Clear all query cache
@@ -123,27 +143,13 @@ export const useSignOut = () => {
   });
 };
 
-// Get user from storage (synchronous, for immediate access)
-export const getStoredUser = async (): Promise<User | null> => {
-  try {
-    const userData = await AsyncStorage.getItem(STORAGE_KEYS.userData);
-    if (userData) {
-      return JSON.parse(userData) as User;
-    }
-    return null;
-  } catch (error) {
-    console.error('Error getting stored user:', error);
-    return null;
-  }
+// Get user from store (synchronous, for immediate access)
+export const getStoredUser = (): User | null => {
+  return useUserStore.getState().user;
 };
 
-// Check if user is authenticated
-export const isAuthenticated = async (): Promise<boolean> => {
-  try {
-    const token = await AsyncStorage.getItem(STORAGE_KEYS.authToken);
-    return !!token;
-  } catch (error) {
-    return false;
-  }
+// Check if user is authenticated (synchronous)
+export const isAuthenticated = (): boolean => {
+  return useAuthStore.getState().isAuthenticated;
 };
 

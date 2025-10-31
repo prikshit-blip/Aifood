@@ -1,32 +1,25 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { ThemeColors, ThemeSpacing, ThemeBorderRadius } from '../../store/stores/themeStore';
 
 const { width, height } = Dimensions.get('window');
 
-export const createStyles = (theme: any, themeData: any) => {
-  const colors = (theme?.colors || themeData?.sections?.colors || {}) as {
-    primary?: string;
-    background?: string;
-    text?: string;
-    box_background?: string;
-    box_text?: string;
-  };
-  const buttons = (theme?.buttons || themeData?.sections?.buttons || {}) as {
-    primary_button?: { background?: string; text_color?: string };
-    secondary_button?: { background?: string; text_color?: string };
-  };
-
-  const backgroundColor = '#FFFFFF';
-  const textColor = colors.text || '#000000';
-  const cardBackground = colors.box_background || '#FFFFFF';
-  const primaryButtonBg = buttons.primary_button?.background || '#000000';
-  const primaryButtonText = buttons.primary_button?.text_color || '#FFFFFF';
-  const secondaryButtonBg = buttons.secondary_button?.background || '#F5F5F5';
-  const secondaryButtonText = buttons.secondary_button?.text_color || '#000000';
+export const createStyles = (
+  colors: ThemeColors | undefined,
+  spacing: ThemeSpacing | undefined,
+  borderRadius: ThemeBorderRadius | undefined
+) => {
+  const backgroundColor = colors?.background || '#FFFFFF';
+  const textColor = colors?.text || '#000000';
+  const cardBackground = colors?.surface || '#FFFFFF';
+  const primaryButtonBg = colors?.text || '#000000';
+  const primaryButtonText = '#FFFFFF';
+  const secondaryButtonBg = colors?.surface || '#F5F5F5';
+  const secondaryButtonText = colors?.text || '#000000';
 
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: 'white',
+      backgroundColor: colors?.whiteBackground || '#FFFFFF',
     },
     scrollContent: {
       flexGrow: 1,
@@ -36,41 +29,38 @@ export const createStyles = (theme: any, themeData: any) => {
       width: width,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: 20,
-
-      backgroundColor: backgroundColor,
+      padding: spacing?.lg || 20,
+      backgroundColor: colors?.whiteBackground || '#FFFFFF',
       overflow: 'hidden',
     },
     illustration: {
-      backgroundColor: 'white',
       width: '100%',
       height: '100%',
     },
     cardContainer: {
       flex: 1,
       justifyContent: 'flex-end',
-      paddingTop: 20,
-
+      paddingTop: spacing?.lg || 20,
     },
     card: {
-      backgroundColor: cardBackground,
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
-      paddingHorizontal: width * 0.08,
-      paddingTop: 20,
-      paddingBottom: 50,
+      backgroundColor: colors?.whiteBackground || '#FFFFFF',
+      borderTopLeftRadius:  borderRadius?.xlg || 40,
+      borderTopRightRadius:  borderRadius?.xlg || 40,
+      paddingHorizontal: spacing?.xl || 32,
+      paddingTop: spacing?.lg || 20,
+      paddingBottom: spacing?.xxl || 50,
       minHeight: height * 0.4,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: -4 },
-      shadowOpacity: 0.1,
+      shadowColor: colors?.secondaryBackground || '#000000',
+      shadowOffset: { width: 0, height: 50 },
+      // shadowOpacity: 0.1,
       shadowRadius: 8,
       elevation: 10,
     },
     titleContainer: {
-      width:"100%",
-      justifyContent:'center',
-      alignItems:'center',
-      paddingBottom:30,
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingBottom: spacing?.xl || 30,
     },
     title: {      
       textAlign: 'center',
@@ -85,7 +75,7 @@ export const createStyles = (theme: any, themeData: any) => {
       
     },
     buttonsContainer: {
-      gap: 15,
+      gap: spacing?.md || 15,
       width: '100%',
     },
     button: {

@@ -11,7 +11,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/types';
-import { useThemeContext } from '../../contexts/ThemeContext';
+import { useTheme } from '../../hooks/useTheme';
+import { useUserStore } from '../../store/stores/userStore';
 import createStyles from './styles';
 
 type SplashScreenNavigationProp = StackNavigationProp<
@@ -28,18 +29,18 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
   const scaleAnim = useRef(new Animated.Value(0.3)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
 
-  const { themeData } = useThemeContext();
-  const themeSnapshotRef = useRef(themeData);
-  const styles = useMemo(() => createStyles(themeSnapshotRef.current), []);
+  const { colors, spacing, borderRadius } = useTheme();
+  const hasCompletedOnboarding = useUserStore((state: any) => state.hasCompletedOnboarding);
+  const styles = useMemo(() => createStyles(colors, spacing, borderRadius), [colors, spacing, borderRadius]);
 
   const dynamicValues = useMemo(() => ({
-    primaryColor: themeSnapshotRef.current?.sections?.colors?.primary || '#FF6B35',
-    logoText: themeSnapshotRef.current?.sections?.top_nav?.logo_text || 'AI',
+    primaryColor: colors?.primary || '#FF6B35',
+    logoText: 'AI',
     appTitle: 'AI Hostess Food',
-    appSubtitle: themeSnapshotRef.current?.sections?.header?.subtitle || 'Smart Food Solutions',
-    domain: themeSnapshotRef.current?.mapping?.domain || '',
-    logoUrl: themeSnapshotRef.current?.sections?.hero?.url,
-  }), []);
+    appSubtitle: 'Smart Food Solutions',
+    domain: 'demo.theaihostess.com',
+    logoUrl: undefined,
+  }), [colors]);
 
   useEffect(() => {
     Animated.parallel([
@@ -61,10 +62,17 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
       }),
     ]).start(() => {
       setTimeout(() => {
-        navigation.replace('Onboarding' as any);
+        // Check if user has completed onboarding
+        if (hasCompletedOnboarding) {
+          console.log('✅ Onboarding completed - navigating to Home');
+          navigation.replace('Home' as any);
+        } else {
+          console.log('🆕 First time - navigating to Onboarding');
+          navigation.replace('Onboarding' as any);
+        }
       }, 1500);
     });
-  }, [navigation]);
+  }, [navigation, hasCompletedOnboarding]);
 
   return (
     <SafeAreaView style={styles.container}>

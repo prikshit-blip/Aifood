@@ -1,22 +1,27 @@
 import { StyleSheet } from 'react-native';
+import { ThemeColors, ThemeSpacing, ThemeBorderRadius } from '../../store/stores/themeStore';
 
-export const createStyles = (theme: any) =>
+export const createStyles = (
+  colors: ThemeColors | undefined,
+  spacing: ThemeSpacing | undefined,
+  borderRadius: ThemeBorderRadius | undefined
+) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme?.colors?.primary || '#FF6B35',
+      backgroundColor: colors?.primary || '#FF6B35',
     },
     mainContainer: {
       flex: 1,
-      backgroundColor: theme?.colors?.primary || '#FF6B35',
+      backgroundColor: colors?.primary || '#FF6B35',
     },
     keyboardAvoidingView: {
       flex: 1,
     },
     header: {
       alignItems: 'center',
-      paddingVertical: 40,
-      backgroundColor: theme?.colors?.primary || '#FF6B35',
+      paddingVertical: spacing?.xxl || 40,
+      backgroundColor: colors?.primary || '#FF6B35',
     },
     logoContainer: {
       width: 100,
@@ -49,59 +54,59 @@ export const createStyles = (theme: any) =>
     },
     content: {
       flex: 1,
-      backgroundColor: theme?.colors?.primary || '#FFFFFF',
+      backgroundColor: colors?.primary || '#FFFFFF',
       position: 'absolute',
       bottom: 0,
       left: 0,
       right: 0,
     },
     formContainer: {
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
-      paddingHorizontal: 16,
+      borderTopLeftRadius: borderRadius?.lg || 24,
+      borderTopRightRadius: borderRadius?.lg || 24,
+      paddingHorizontal: spacing?.md || 16,
       backgroundColor: '#FFFFFF',
-      paddingTop: 18,
+      paddingTop: spacing?.md || 18,
       position: 'relative',
     },
     title: {
       fontSize: 32,
       fontWeight: 'bold',
-      marginBottom: 10,
+      marginBottom: spacing?.sm || 10,
       textAlign: 'center',
       position: 'static',
       top: 0,
-      color: theme?.colors?.primary_text || '#000000',
+      color: colors?.normalText|| '#000000',
     },
     subtitle: {
       fontSize: 14,
-      marginBottom: 32,
+      marginBottom: spacing?.xl || 32,
       textAlign: 'center',
-      color: theme?.colors?.primary_text,
+      color: colors?.lightText || '#666666',
       lineHeight: 20,
-      paddingHorizontal: 10,
+      paddingHorizontal: spacing?.sm || 10,
     },
     inputContainer: {
-      marginBottom: 16,
+      marginBottom: spacing?.md || 16,
       textAlignVertical: 'center',
     },
     inputWrapper: {
       flexDirection: 'row',
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: '#E0E0E0',
-      borderRadius: 12,
-      paddingHorizontal: 16,
-      backgroundColor: '#F8F9FA',
+      borderColor: colors?.border || '#E0E0E0',
+      borderRadius: borderRadius?.md || 12,
+      paddingHorizontal: spacing?.md || 16,
+      backgroundColor: colors?.whiteBackground || '#F8F9FA',
     },
     inputIcon: {
       fontSize: 20,
-      marginRight: 12,
+      marginRight: spacing?.md || 12,
     },
     input: {
       flex: 1,
-      paddingVertical: 16,
+      paddingVertical: spacing?.md || 16,
       fontSize: 16,
-      color: '#000000',
+      color: colors?.normalText || '#000000',
       textAlignVertical: 'center',
     },
     eyeIcon: {
@@ -111,16 +116,16 @@ export const createStyles = (theme: any) =>
       fontSize: 20,
     },
     signUpButton: {
-      backgroundColor: '#000000',
-      borderRadius: 12,
+      backgroundColor: colors?.secondaryBackground || '#000000',
+      borderRadius: borderRadius?.md || 12,
       alignItems: 'center',
       justifyContent: 'center',
-      marginTop: 8,
-      marginBottom: 8,
+      marginTop: spacing?.sm || 8,
+      marginBottom: spacing?.sm || 8,
       height: 50,
     },
     signUpButtonText: {
-      color: '#FFFFFF',
+      color: colors?.whiteText || '#FFFFFF',
       fontSize: 18,
       fontWeight: 'bold',
       letterSpacing: 1,

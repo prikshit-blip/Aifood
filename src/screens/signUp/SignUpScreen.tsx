@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,11 +16,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/types';
-import { useThemeContext } from '../../contexts/ThemeContext';
+import { useTheme } from '../../hooks/useTheme';
+import { validateEmail, validatePassword, validatePhone, validateName } from '../../utils/validators';
+import { handleApiError } from '../../utils/errorHandler';
 import AppHeading from '../../components/ui/AppHeading';
 import AppText from '../../components/ui/AppText';
 import AppButton from '../../components/ui/AppButton';
 import AppTextInput from '../../components/ui/AppTextInput';
+import AppImage from '../../components/ui/AppImage';
 import { ICONS } from '../../assests';
 import createStyles from './styles';
 
@@ -36,17 +39,37 @@ const SignUpScreen: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { themeData } = useThemeContext();
-  const styles = createStyles(themeData?.sections);
+  const { colors, spacing, borderRadius } = useTheme();
+  const styles = useMemo(() => createStyles(colors, spacing, borderRadius), [colors, spacing, borderRadius]);
 
   const handleSignUp = async () => {
-    if (!name || !email || !phone || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+    // Validate name
+    if (!validateName(name)) {
+      Alert.alert('Invalid Name', 'Please enter a valid name (letters only)');
+      return;
+    }
+
+    // Validate email
+    if (!validateEmail(email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      return;
+    }
+
+    // Validate phone
+    if (!validatePhone(phone)) {
+      Alert.alert('Invalid Phone', 'Please enter a valid phone number (10-15 digits)');
+      return;
+    }
+
+    // Validate password
+    if (!validatePassword(password)) {
+      Alert.alert('Invalid Password', 'Password must be at least 8 characters');
       return;
     }
 
     setIsLoading(true);
     try {
+      // TODO: Replace with actual API call
       const user = {
         firstName: name.split(' ')[0],
         lastName: name.split(' ')[1] || '',
@@ -56,7 +79,7 @@ const SignUpScreen: React.FC = () => {
 
       navigation.navigate('Home');
     } catch (error) {
-      Alert.alert('Error', 'Sign up failed. Please try again.');
+      handleApiError(error);
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +93,7 @@ const SignUpScreen: React.FC = () => {
     navigation.navigate('Home');
   };
 
-  const primaryColor = themeData?.sections?.colors?.primary || '#FF6B35';
+  const primaryColor = colors?.primary || '#FF6B35';
 
   return (
     <SafeAreaView style={styles.container} edges={['top','left','right']}>
@@ -167,21 +190,24 @@ const SignUpScreen: React.FC = () => {
             {/* Social Login Buttons */}
             <View style={styles.socialContainer}>
               <TouchableOpacity style={styles.socialButton}>
-                <Image
+                <AppImage
                   source={{ uri: 'https://www.google.com/favicon.ico' }}
                   style={styles.socialIcon}
+                  resizeMode="contain"
                 />
               </TouchableOpacity>
               <TouchableOpacity style={styles.socialButton}>
-                <Image
+                <AppImage
                   source={{ uri: 'https://www.facebook.com/favicon.ico' }}
                   style={styles.socialIcon}
+                  resizeMode="contain"
                 />
               </TouchableOpacity>
               <TouchableOpacity style={styles.socialButton}>
-                <Image
+                <AppImage
                   source={{ uri: 'https://www.apple.com/favicon.ico' }}
                   style={styles.socialIcon}
+                  resizeMode="contain"
                 />
               </TouchableOpacity>
             </View>

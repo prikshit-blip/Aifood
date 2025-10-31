@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle, GestureResponderEvent } from 'react-native';
-import { useThemeContext } from '../../contexts/ThemeContext';
+import { useTheme } from '../../hooks/useTheme';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
@@ -23,9 +23,18 @@ const AppButton: React.FC<ButtonProps> = ({
   style,
   textStyle,
 }) => {
-  const { theme, themeData } = useThemeContext();
+  const { colors } = useTheme();
 
-  const buttons = (theme?.buttons || themeData?.sections?.buttons || {}) as {
+  const buttons = {
+    primary_button: {
+      background: colors?.text || '#000000',
+      text_color: '#FFFFFF',
+    },
+    secondary_button: {
+      background: colors?.surface || '#F5F5F5',
+      text_color: colors?.text || '#000000',
+    },
+  } as {
     primary_button?: { background?: string; text_color?: string };
     secondary_button?: { background?: string; text_color?: string };
   };
@@ -74,9 +83,10 @@ function getVariantStyles(
     case 'outline':
       return {
         container: {
-          backgroundColor: '#F5F5F5',
+          backgroundColor: "#f6f6f6",
           borderWidth: 1,
-          borderColor: '#333333',
+          borderOpacity: 0.5,
+          borderColor: 'rgba(190, 185, 185, 0.5)',
         } as ViewStyle,
         text: { color: '#000000' } as TextStyle,
       };

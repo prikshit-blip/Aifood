@@ -1,14 +1,19 @@
 import { StyleSheet } from 'react-native';
+import { ThemeColors, ThemeSpacing, ThemeBorderRadius } from '../../store/stores/themeStore';
 
-export const createStyles = (theme: any) =>
+export const createStyles = (
+  colors: ThemeColors | undefined,
+  spacing: ThemeSpacing | undefined,
+  borderRadius: ThemeBorderRadius | undefined
+) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme?.colors?.primary || '#FF6B35',
+      backgroundColor: colors?.primary || '#FF6B35',
     },
     mainContainer:{
       flex: 1,
-      backgroundColor: theme?.colors?.primary || '#FF6B35',
+      backgroundColor: colors?.primary || '#FF6B35',
 
     },
     keyboardAvoidingView: {
@@ -17,7 +22,7 @@ export const createStyles = (theme: any) =>
     header: {
       alignItems: 'center',
       paddingVertical: 40,
-      backgroundColor: theme?.colors?.primary || '#FF6B35',
+      backgroundColor: colors?.primary || '#FF6B35',
     },
     logoContainer: {
       width: 100,
@@ -50,7 +55,7 @@ export const createStyles = (theme: any) =>
     },
     content: {
       flex: 1,
-      backgroundColor: theme?.colors?.primary || '#FFFFFF',
+      backgroundColor: colors?.primary || '#FFFFFF',
       position:"absolute",
       bottom:0,
       left:0,
@@ -70,13 +75,13 @@ export const createStyles = (theme: any) =>
       textAlign: 'center',
       position:'static',
       top:0,
-      color: theme?.colors?.primary_text || '#000000',
+      color: colors?.normalText || '#000000',
     },
     subtitle: {
       fontSize: 14,
       marginBottom: 32,
       textAlign: 'center',
-      color: theme?.colors?.primary_text,
+      color: colors?.lightText,
       lineHeight: 20,
       paddingHorizontal: 10,
     },
@@ -98,8 +103,8 @@ export const createStyles = (theme: any) =>
       marginRight: 12,
     },
     inputIconImage: {
-      backgroundColor:'red',
-      tintColor:'white',
+      
+      tintColor:colors?.primaryText || '#000000',
       width: 22,
       height: 22,
       marginRight: 12,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,38 +16,68 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/types';
-import { useThemeContext } from '../../contexts/ThemeContext';
-import createStyles from './styles';
+import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../hooks/useTheme';
+import { validateEmail, validatePassword } from '../../utils/validators';
+import { handleApiError } from '../../utils/errorHandler';
+import { createStyles } from './styles';
 
 type SignInScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignIn'>;
 
 const SignInScreen: React.FC = () => {
   const navigation = useNavigation<SignInScreenNavigationProp>();
+  const { login } = useAuth();
+  const { colors, spacing, borderRadius } = useTheme();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { themeData } = useThemeContext();
-  const styles = createStyles(themeData?.sections);
+  // Memoized styles using new theme tokens
+  const styles = useMemo(
+    () => createStyles(colors, spacing, borderRadius),
+    [colors, spacing, borderRadius]
+  );
 
   const handleSignIn = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+    // Validate email
+    if (!validateEmail(email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      return;
+    }
+
+    // Validate password
+    if (!validatePassword(password)) {
+      Alert.alert('Invalid Password', 'Password must be at least 8 characters');
       return;
     }
 
     setIsLoading(true);
     try {
-      const user = {
-        email: email,
-        password: password,
-      };
+      // TODO: Replace with actual API call
+      // const response = await authApi.login(email, password);
+      
+      // Mock login with Zustand store
+      login(
+        'mock-token-' + Date.now(),
+        'mock-refresh-token',
+        3600,
+        {
+          id: '1',
+          email: email,
+          name: email.split('@')[0],
+          role: 'customer',
+          preferences: {
+            language: 'en',
+            notifications: true,
+          },
+        }
+      );
 
       navigation.navigate({ name: 'Home', params: undefined });
     } catch (error) {
-      Alert.alert('Error', 'Sign up failed. Please try again.');
+      handleApiError(error);
     } finally {
       setIsLoading(false);
     }
@@ -61,13 +91,11 @@ const SignInScreen: React.FC = () => {
     navigation.navigate({ name: 'SignUp', params: undefined });
   };
 
-  const primaryColor = themeData?.sections?.colors?.primary || '#FF6B35';
-
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <StatusBar
         barStyle="light-content"
-        backgroundColor={primaryColor}
+        backgroundColor={colors?.primary || '#FF6B35'}
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

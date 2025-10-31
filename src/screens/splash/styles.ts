@@ -1,13 +1,17 @@
 import { Dimensions, StyleSheet } from 'react-native';
+import { ThemeColors, ThemeSpacing, ThemeBorderRadius } from '../../store/stores/themeStore';
 
 const { width } = Dimensions.get('window');
 
-const createStyles = (themeData: any) => {
-  const colors = themeData?.sections?.colors || {};
-  const primaryColor = colors.primary || '#FF6B35';
-  const boxBackgroundColor = colors.box_background || '#FFFFFF';
-  const primaryTextColor = colors.primary_text || primaryColor;
-  const backgroundTextColor = colors.background_text || '#FFFFFF';
+const createStyles = (
+  colors: ThemeColors | undefined,
+  spacing: ThemeSpacing | undefined,
+  borderRadius: ThemeBorderRadius | undefined
+) => {
+  const primaryColor = colors?.primary || '#FF6B35';
+  const boxBackgroundColor = colors?.surface || '#FFFFFF';
+  const primaryTextColor = colors?.text || primaryColor;
+  const backgroundTextColor = colors?.text || '#FFFFFF';
 
   return StyleSheet.create({
     container: {
@@ -27,7 +31,7 @@ const createStyles = (themeData: any) => {
       width: 120,
       height: 120,
       borderRadius: 60,
-      backgroundColor: 'white',
+      
       justifyContent: 'center',
       alignItems: 'center',
       shadowColor: '#000',
@@ -40,7 +44,7 @@ const createStyles = (themeData: any) => {
       width: 120,
       height: 120,
       borderRadius: 60,
-      backgroundColor: 'white',
+      // backgroundColor: 'white',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,

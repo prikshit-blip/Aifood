@@ -1,17 +1,20 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuthStore } from '../store/stores/authStore';
+import { useTenantStore } from '../store/stores/tenantStore';
+import { useSessionStore } from '../store/stores/sessionStore';
 
-// Get base URL from tenant or config
-const getBaseURL = () => {
-  // TODO: Auto-detect from tenant domain
-  // For now, using default - update this when tenant detection is implemented
-  const tenantDomain = 'demo.theaihostess.com'; // Get from tenant detection
-  return `https://${tenantDomain}/api/v1`;
+/**
+ * Get base URL from tenant store
+ */
+const getBaseURL = (): string => {
+  const tenant = useTenantStore.getState().tenant;
+  return tenant?.baseUrl || 'https://demo.theaihostess.com/api/v1';
 };
 
-// Create axios instance
+/**
+ * Create axios instance
+ */
 const apiClient: AxiosInstance = axios.create({
-  baseURL: getBaseURL(),
   timeout: 30000, // 30 seconds
   headers: {
     'Content-Type': 'application/json',
@@ -19,17 +22,39 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor - Add auth token
+/**
+ * Request interceptor
+ * - Sets dynamic base URL from tenant store
+ * - Adds auth token from auth store
+ * - Adds session cookies (sid) from session store
+ */
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    try {
-      const token = await AsyncStorage.getItem('@auth_token');
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (error) {
-      console.error('Error getting token from storage:', error);
+    // Dynamic base URL from tenant store
+    config.baseURL = getBaseURL();
+    
+    // Add auth token from auth store
+    const { token, isTokenExpired } = useAuthStore.getState();
+    
+    if (token && !isTokenExpired()) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Add session cookies (sid) from session store
+    // This is CRITICAL for all API calls after theme fetch
+    const { getCookies, getSid } = useSessionStore.getState();
+    const cookies = getCookies();
+    const sid = getSid();
+    
+    if (cookies) {
+      config.headers.Cookie = cookies;
+      console.log('🍪 Added session cookies to request:', cookies.substring(0, 50) + '...');
+    } else if (sid) {
+      // Fallback: if we only have sid, create cookie string
+      config.headers.Cookie = `sid=${sid}`;
+      console.log('🍪 Added sid to request:', sid);
+    }
+    
     return config;
   },
   (error) => {
@@ -37,28 +62,26 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor - Handle errors globally
+/**
+ * Response interceptor
+ * - Auto-logout on 401
+ * - Error normalization
+ */
 apiClient.interceptors.response.use(
   (response) => {
     // Return response data directly
     return response.data;
   },
   async (error: AxiosError) => {
-    // Handle 401 Unauthorized
+    // Handle 401 Unauthorized - Auto logout
     if (error.response?.status === 401) {
-      try {
-        // Clear auth data
-        await AsyncStorage.removeItem('@auth_token');
-        await AsyncStorage.removeItem('@user_data');
-        // TODO: Navigate to login screen
-      } catch (storageError) {
-        console.error('Error clearing storage:', storageError);
-      }
+      const { logout } = useAuthStore.getState();
+      logout();
+      // TODO: Navigate to login screen
     }
 
     // Handle network errors
     if (!error.response) {
-      // Network error or timeout
       const networkError = {
         message: 'Network error. Please check your internet connection.',
         code: 'NETWORK_ERROR',

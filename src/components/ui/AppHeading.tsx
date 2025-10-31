@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet, TextStyle, StyleProp } from 'react-native';
-import { useThemeContext } from '../../contexts/ThemeContext';
+import { useTheme } from '../../hooks/useTheme';
 
 type HeadingVariant = 'default' | 'primary';
 
@@ -23,9 +23,9 @@ const AppHeading: React.FC<HeadingProps> = ({
   style,
   numberOfLines,
 }) => {
-  const { theme, themeData } = useThemeContext();
+  const { colors: themeColors } = useTheme();
 
-  const colors = (theme?.colors || themeData?.sections?.colors || {}) as {
+  const colors = themeColors as {
     primary?: string;
     primary_text?: string;
     text?: string;

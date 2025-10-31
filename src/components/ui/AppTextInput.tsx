@@ -8,7 +8,7 @@ import {
   TextStyle,
   Pressable,
 } from 'react-native';
-import { useThemeContext } from '../../contexts/ThemeContext';
+import { useTheme } from '../../hooks/useTheme';
 
 interface AppTextInputProps extends Omit<TextInputProps, 'style'> {
   containerStyle?: ViewStyle;
@@ -31,9 +31,9 @@ const AppTextInput: React.FC<AppTextInputProps> = ({
   editable = true,
   ...textInputProps
 }) => {
-  const { theme, themeData } = useThemeContext();
+  const { colors: themeColors } = useTheme();
 
-  const colors = (theme?.colors || themeData?.sections?.colors || {}) as {
+  const colors = themeColors as {
     primary?: string;
     primary_text?: string;
     text?: string;

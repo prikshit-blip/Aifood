@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text as RNText, StyleSheet, TextStyle, StyleProp } from 'react-native';
-import { useThemeContext } from '../../contexts/ThemeContext';
+import { useTheme } from '../../hooks/useTheme';
 
 type TextVariant = 'default' | 'primary' | 'secondary';
 
@@ -23,9 +23,9 @@ const AppText: React.FC<AppTextProps> = ({
   style,
   numberOfLines,
 }) => {
-  const { theme, themeData } = useThemeContext();
+  const { colors: themeColors } = useTheme();
 
-  const colors = (theme?.colors || themeData?.sections?.colors || {}) as {
+  const colors = themeColors as {
     primary?: string;
     background_text?: string;
     primary_text?: string;

@@ -5,21 +5,19 @@ import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Import screens
-import SplashScreen from '../screens/SplashScreen';
-import SignInScreen from '../screens/SignInScreen';
-import OnboardingScreen from '../screens/OnboardingScreen';
-import SignUpScreen from '../screens/SignUpScreen';
-import HomeScreen from '../screens/HomeScreen';
+import SplashScreen from '../screens/splash/SplashScreen';
+import SignInScreen from '../screens/signIn/SignInScreen';
+import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
+import SignUpScreen from '../screens/signUp/SignUpScreen';
+import HomeScreen from '../screens/home/HomeScreen';
 
-// Import types
-import { TenantConfig } from '../config/tenantConfig';
 
 // Navigation types
 export type RootStackParamList = {
   Splash: undefined;
   Onboarding: undefined;
   SignIn: undefined;
-  SignUp: { tenant: TenantConfig };
+  SignUp: undefined;
   Home: undefined;
 };
 
@@ -65,7 +63,6 @@ const AppNavigator: React.FC = () => {
               gestureEnabled: false,
             }}
           />
-         
           <Stack.Screen 
             name="SignIn" 
             component={SignInScreen}
