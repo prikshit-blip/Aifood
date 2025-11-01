@@ -3,14 +3,18 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 import { BottomTabNavigatorProps, TabItem } from '../../types/home';
 import AppText from '../ui/AppText';
+import { ICONS, IMAGES } from '../../assests';
+import AppImage from '../ui/AppImage';
+import FastImage from 'react-native-fast-image';
+
 
 // Tab Icons (using emojis as fallback - in production, use react-native-vector-icons)
 const TAB_ICONS: Record<TabItem, string> = {
-  Home: '🏠',
-  Promos: '🏷️',
-  Service: '🔔',
-  Gift: '🎁',
-  Cart: '🛒',
+  Home: ICONS.Home,
+  Promos: ICONS.Promos,
+  Service: ICONS.Service,
+  Gift: ICONS.Gift,
+  Cart: ICONS.Cart,
 };
 
 const TAB_LABELS: Record<TabItem, string> = {
@@ -67,7 +71,10 @@ const BottomTabNavigator: React.FC<BottomTabNavigatorProps> = ({
               activeOpacity={0.7}
             >
               <View style={styles.iconContainer}>
-                <AppText style={{ fontSize: 24 }}>{TAB_ICONS[tab]}</AppText>
+                <FastImage style={{width:24, height:24}} source={TAB_ICONS[tab]} resizeMode="contain" />
+               
+                
+                {/* <AppText style={{ fontSize: 24 }}>{tab}1</AppText> */}
                 {isCart && cartItemCount > 0 && (
                   <View
                     style={[

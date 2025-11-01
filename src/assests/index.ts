@@ -19,6 +19,16 @@
  * Supports both PNG and SVG formats
  */
 export const ICONS = {
+  
+  // bottom tab icons
+  Home: require('./icons/homeTab.png'),
+  
+  Cart: require('./icons/cart.png'),
+  Gift:require('./icons/Gift.png'),
+  Service:require('./icons/service.png'),
+  Promos:require('./icons/promos.png'),
+  search:require('./icons/searchIcon.png'),
+  
   // Social ICONS
   apple: require('./icons/apple.svg'),
   social: require('./icons/social.svg'),
