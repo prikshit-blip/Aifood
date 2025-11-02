@@ -3,6 +3,9 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 import { FloatingSearchButtonProps } from '../../types/home';
 import AppText from '../ui/AppText';
+import { ICONS } from '../../assests';
+import AppImage from '../ui/AppImage';
+import FastImage from 'react-native-fast-image';
 
 const FloatingSearchButton: React.FC<FloatingSearchButtonProps> = ({
   onPress,
@@ -35,9 +38,11 @@ const FloatingSearchButton: React.FC<FloatingSearchButtonProps> = ({
         },
       ]}
     >
-      <AppText style={{ fontSize: 24, color: colors.whiteText || '#FFFFFF' }}>
+      {/* <AppText style={{ fontSize: 24, color: colors.whiteText || '#FFFFFF' }}>
         🔍
-      </AppText>
+      </AppText> */}
+      <AppImage source={ICONS.search} style={{width:20,height:18,}} tintColor="white" />
+      {/* <FastImage source={ICONS.search} style={{width:20,height:18, }} tintColor={"white"} /> */}
     </TouchableOpacity>
   );
 };

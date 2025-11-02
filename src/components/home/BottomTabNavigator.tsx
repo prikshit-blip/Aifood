@@ -71,7 +71,10 @@ const BottomTabNavigator: React.FC<BottomTabNavigatorProps> = ({
               activeOpacity={0.7}
             >
               <View style={styles.iconContainer}>
-                <FastImage style={{width:24, height:24}} source={TAB_ICONS[tab]} resizeMode="contain" />
+                <FastImage style={{width:24, height:24}} 
+                  source={TAB_ICONS[tab]} 
+                  resizeMode="contain"
+                 />
                
                 
                 {/* <AppText style={{ fontSize: 24 }}>{tab}1</AppText> */}

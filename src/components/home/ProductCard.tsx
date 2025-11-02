@@ -3,7 +3,10 @@ import { View, TouchableOpacity, Image, StyleSheet, ImageSourcePropType } from '
 import { useTheme } from '../../hooks/useTheme';
 import { ProductCardProps } from '../../types/home';
 import AppText from '../ui/AppText';
-import { getImage } from '../../assests';
+import { getImage, ICONS } from '../../assests';
+import AppImage from '../ui/AppImage';
+import FastImage from 'react-native-fast-image';
+import AppHeading from '../ui/AppHeading';
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
@@ -47,7 +50,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         styles.container,
         {
           backgroundColor: colors.whiteBackground || '#FFFFFF',
-          padding: spacing.md || 16,
+          padding: spacing.sm || 8,
           marginBottom: spacing.md || 16,
           borderRadius: borderRadius.md || 12,
         },
@@ -61,8 +64,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
             style={[
               styles.image,
               {
-                width: 100,
-                height: 100,
+                width: "40%",
+                height: "100%",
                 borderRadius: borderRadius.md || 12,
                 backgroundColor: colors.greyBackground || '#F5F5F5',
               },
@@ -72,19 +75,29 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
 
         {/* Product Details */}
-        <View style={[styles.details, { marginLeft: spacing.md || 16 }]}>
+        <View style={[styles.details, { marginLeft: spacing.sm|| 8 }]}>
           {/* Title */}
           <AppText
             style={{
-              fontSize: 16,
-              fontWeight: '600',
-              color: colors.primaryText || '#000000',
+              fontSize: 18,
+              fontWeight: '800',
+              color: colors.normalText || '#000000',
               marginBottom: spacing.xs || 4,
             }}
             numberOfLines={1}
           >
             {product.title || 'Untitled Product'}
           </AppText>
+
+          <AppHeading
+          fontSize={18}
+          numberOfLines={1}
+          style={{lineHeight:24,}}
+          >
+            {product.title || 'Untitled Product'}
+          </AppHeading>
+
+          <View style={styles.subHeadingContainer}>
 
           {/* Sub Heading */}
           {product.subHeading && (
@@ -96,13 +109,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
               }}
               numberOfLines={1}
             >
-              {product.subHeading}
+            {product.subHeading}
             </AppText>
           )}
-
-          {/* Tags Row (Popular, Dietary Icons) */}
-          <View style={[styles.tagsRow, { marginBottom: spacing.xs || 4 }]}>
-            {product.isPopular && (
+            {product.subHeading} {product.isPopular && (
               <View
                 style={[
                   styles.tag,
@@ -120,6 +130,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 </AppText>
               </View>
             )}
+
+            </View>
+
+          {/* Tags Row (Popular, Dietary Icons) */}
+          <View style={[styles.tagsRow, { marginBottom: spacing.xs || 4 }]}>
+           
 
             {/* Dietary Icons */}
             <View style={styles.dietaryIcons}>
@@ -200,9 +216,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
               activeOpacity={0.7}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <AppText style={{ fontSize: 20 }}>
+              {/* <AppText style={{ fontSize: 20 }}>
                 {product.isFavorite ? '❤️' : '🤍'}
-              </AppText>
+              </AppText> */}
+              <FastImage
+              source={product?.isFavorite?ICONS.heart_fill :ICONS.heart}
+              tintColor={product.isFavorite ? colors?.primary||'#FF4444' : colors.black || '#666666'}
+              style={{width:20, height:18,}}
+              />
+              {/* <AppImage
+                source={ICONS.heart}
+                width={24}
+                height={24}
+                tintColor={product.isFavorite ? '#FF4444' : colors.black || '#666666'}
+              /> */}
             </TouchableOpacity>
           </View>
         </View>
@@ -222,6 +249,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flexDirection: 'row',
+  },
+  subHeadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   image: {
     width: 100,

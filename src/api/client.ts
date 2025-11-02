@@ -12,6 +12,14 @@ const getBaseURL = (): string => {
 };
 
 /**
+ * Get base domain from tenant store
+ */
+const getDomain = (): string => {
+  const tenant = useTenantStore.getState().tenant;
+  return tenant?.domain || 'demo.theaihostess.com';
+};
+
+/**
  * Create axios instance
  */
 const apiClient: AxiosInstance = axios.create({
@@ -30,8 +38,14 @@ const apiClient: AxiosInstance = axios.create({
  */
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    // Dynamic base URL from tenant store
-    config.baseURL = getBaseURL();
+    // Check if URL is already absolute (starts with http:// or https://)
+    // Axios automatically skips baseURL for absolute URLs
+    const isAbsoluteUrl = config.url?.startsWith('http://') || config.url?.startsWith('https://');
+    
+    // Only set baseURL if URL is NOT absolute
+    if (!isAbsoluteUrl) {
+      config.baseURL = getBaseURL();
+    }
     
     // Add auth token from auth store
     const { token, isTokenExpired } = useAuthStore.getState();

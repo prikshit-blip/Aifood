@@ -5,6 +5,7 @@ import FastImage, { ImageStyle, Priority, ResizeMode, Source } from 'react-nativ
 export type AppImageSource = number | { uri: string } | Source;
 
 interface AppImageProps {
+  tintColor?: string;
   source: AppImageSource | null | undefined;
   style?: StyleProp<ImageStyle>;
   containerStyle?: StyleProp<ViewStyle>;
@@ -26,6 +27,7 @@ const AppImage: React.FC<AppImageProps> = ({
   source,
   style,
   containerStyle,
+  tintColor="black",
   resizeMode = FastImage.resizeMode.cover,
   priority = FastImage.priority.normal,
   cache = 'web',
@@ -77,6 +79,7 @@ const AppImage: React.FC<AppImageProps> = ({
       onLoadStart={handleLoadStart}
       onLoadEnd={handleLoadEnd}
       onError={handleError}
+      tintColor={tintColor}
       accessibilityLabel={accessibilityLabel}
       accessible={!!accessibilityLabel}
     />

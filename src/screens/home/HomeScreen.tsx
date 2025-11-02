@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { Suspense, useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -19,7 +19,7 @@ import ErrorBoundary from 'react-native-error-boundary';
 import AppText from '../../components/ui/AppText';
 import {
   HomeScreenState,
-  MenuItem,
+  MenuItem as HomeMenuItem,
   CategoryItem,
   Product,
   TabItem,
@@ -27,6 +27,9 @@ import {
 } from '../../types/home';
 import createStyles from './styles';
 import { CategoryErrorFallback } from '../../components/ErrorBoundary';
+import { useStoreMenu } from '../../api/menu/useMenu';
+import type { MenuItem as ApiMenuItem, MenuCategory } from '../../api/menu/menuApi';
+import ShimmerHeader from '../../components/ui/ShimmerHeader';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -46,28 +49,43 @@ const HomeScreen: React.FC = () => {
     favoriteProducts: [],
   });
 
+  // ========== Fetch Menu Data from API ==========
+  const { data: menuData, isLoading: isLoadingMenu, error: menuError } = useStoreMenu();
 
-  // ========== Mock Data (Replace with API calls) ==========
-  const menuItems: MenuItem[] = useMemo(
-    () => [
-      { id: 'anu', label: 'anu' },
-      { id: 'lunch', label: 'Lunch menu' },
-      { id: 'dinner', label: 'Dinner menu' },
-      { id: 'plick', label: 'Plick' },
-    ],
-    []
-  );
+  // ========== Transform API Data to Component Types ==========
+  const menuItems: HomeMenuItem[] = useMemo(() => {
+    if (!menuData?.menus) return [];
+    
+    // Sort menus by sequence_id
+    const sortedMenus = [...menuData.menus].sort((a, b) => a.menu_sequence_id - b.menu_sequence_id);
+    
+    return sortedMenus.map((menu: ApiMenuItem) => ({
+      id: menu.menu_id.toString(),
+      label: menu.menu_name,
+      value: menu.menu_id.toString(),
+    }));
+  }, [menuData]);
 
-  const categoryItems: CategoryItem[] = useMemo(
-    () => [
-      { id: 'snacks', label: 'Snacks' },
-      { id: 'featured', label: 'Featured Dishes' },
-      { id: 'appetizers', label: 'Appetizers' },
-      { id: 'main-course', label: 'Main Course' },
-      { id: 'desserts', label: 'Desserts' },
-    ],
-    []
-  );
+  const categoryItems: CategoryItem[] = useMemo(() => {
+    if (!state.selectedMenuId || !menuData?.menus) return [];
+    
+    // Find selected menu
+    const selectedMenu = menuData.menus.find(
+      (menu: ApiMenuItem) => menu.menu_id.toString() === state.selectedMenuId
+    );
+    
+    if (!selectedMenu?.categories) return [];
+    
+    // Sort categories by sequence_id
+    const sortedCategories = [...selectedMenu.categories].sort(
+      (a, b) => a.category_sequence_id - b.category_sequence_id
+    );
+    
+    return sortedCategories.map((category: MenuCategory) => ({
+      id: category.category_id.toString(),
+      label: category.category_name,
+    }));
+  }, [menuData, state.selectedMenuId]);
 
   const mockProducts: Product[] = useMemo(
     () => [
@@ -164,7 +182,7 @@ const HomeScreen: React.FC = () => {
     if (menuItems.length > 0 && !state.selectedMenuId) {
       setState((prev) => ({
         ...prev,
-        selectedMenuId: menuItems[1]?.id || menuItems[0]?.id || null, // Default to "Lunch menu"
+        selectedMenuId: menuItems[0]?.id || null, // Default to first menu
       }));
     }
   }, [menuItems, state.selectedMenuId]);
@@ -173,7 +191,7 @@ const HomeScreen: React.FC = () => {
     if (categoryItems.length > 0 && !state.selectedCategoryId) {
       setState((prev) => ({
         ...prev,
-        selectedCategoryId: categoryItems[0]?.id || null, // Default to "Snacks"
+        selectedCategoryId: categoryItems[0]?.id || null, // Default to first category
       }));
     }
   }, [categoryItems, state.selectedCategoryId]);
@@ -187,7 +205,11 @@ const HomeScreen: React.FC = () => {
 
   // ========== Handlers ==========
   const handleMenuSelect = useCallback((itemId: string) => {
-    setState((prev) => ({ ...prev, selectedMenuId: itemId }));
+    setState((prev) => ({ 
+      ...prev, 
+      selectedMenuId: itemId,
+      selectedCategoryId: null, // Reset category when menu changes
+    }));
   }, []);
 
   const handleCategorySelect = useCallback((categoryId: string) => {
@@ -350,6 +372,47 @@ const HomeScreen: React.FC = () => {
     return null;
   }
 
+  // Show loading state while fetching menu data
+  // if (isLoadingMenu) {
+  //   return (
+  //     <SafeAreaView
+  //       edges={['top']}
+  //       style={[styles.container, { backgroundColor: colors.whiteBackground || '#FFFFFF', justifyContent: 'center', alignItems: 'center' }]}
+  //     >
+  //       <AppText style={{ fontSize: 16, color: colors.greyText }}>Loading menu...</AppText>
+  //     </SafeAreaView>
+  //   );
+  // }
+
+  // Show error state if menu fetch failed
+  if (menuError) {
+    return (
+      <SafeAreaView
+        edges={['top']}
+        style={[styles.container, { backgroundColor: colors.whiteBackground || '#FFFFFF', justifyContent: 'center', alignItems: 'center' }]}
+      >
+        <AppText style={{ fontSize: 16, color: colors.error, marginBottom: spacing.md }}>
+          Failed to load menu. Please try again.
+        </AppText>
+        <TouchableOpacity
+          style={{
+            backgroundColor: colors.primary,
+            paddingHorizontal: spacing.lg,
+            paddingVertical: spacing.md,
+            borderRadius: borderRadius.md,
+          }}
+          onPress={() => {
+            Alert.alert('Info', 'Please refresh the app');
+          }}
+        >
+          <AppText style={{ color: colors.whiteText, fontSize: 16, fontWeight: '600' }}>
+            OK
+          </AppText>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView
       edges={['top']}
@@ -363,11 +426,21 @@ const HomeScreen: React.FC = () => {
       />
 
       {/* Menu Header */}
-      <MenuHeader
-        items={menuItems}
-        selectedItemId={state.selectedMenuId || undefined}
-        onItemSelect={handleMenuSelect}
-      />
+      <ErrorBoundary
+        onError={(error: Error, stackTrace: string) => {
+          console.error('🛡️ ErrorBoundary caught error in MenuHeader:', error, stackTrace);
+        }}
+        FallbackComponent={CategoryErrorFallback}
+      >
+        <Suspense fallback={<ShimmerHeader itemCount={4} itemWidth={120} itemHeight={40} />}>
+          <MenuHeader
+            items={menuItems}
+            selectedItemId={state.selectedMenuId || undefined}
+            onItemSelect={handleMenuSelect}
+            loading={isLoadingMenu}
+          />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* Category Header - Wrapped with Error Boundary */}
       <ErrorBoundary
@@ -376,11 +449,14 @@ const HomeScreen: React.FC = () => {
         }}
         FallbackComponent={CategoryErrorFallback}
       >
-        <CategoryHeader
-          categories={categoryItems}
-          selectedCategoryId={state.selectedCategoryId || undefined}
-          onCategorySelect={handleCategorySelect}
-        />
+        <Suspense fallback={<ShimmerHeader itemCount={5} itemWidth={100} itemHeight={36} />}>
+          <CategoryHeader
+            categories={categoryItems}
+            selectedCategoryId={state.selectedCategoryId || undefined}
+            onCategorySelect={handleCategorySelect}
+            loading={isLoadingMenu}
+          />
+        </Suspense>
       </ErrorBoundary>
 
       {/* Product List - Wrapped with Error Boundary */}

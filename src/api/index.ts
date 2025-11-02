@@ -17,3 +17,7 @@ export * from './auth/useAuth';
 // Theme
 export * from './theme/themeApi';
 
+// Menu
+export * from './menu/menuApi';
+export * from './menu/useMenu';
+

@@ -20,6 +20,7 @@ export interface MenuHeaderProps {
   items: MenuItem[];
   selectedItemId?: string;
   onItemSelect: (itemId: string) => void;
+  loading?: boolean;
 }
 
 // ========== Category Header Types ==========
@@ -32,6 +33,7 @@ export interface CategoryHeaderProps {
   categories: CategoryItem[];
   selectedCategoryId?: string;
   onCategorySelect: (categoryId: string) => void;
+  loading?: boolean;
 }
 
 // ========== Product Types ==========

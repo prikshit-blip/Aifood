@@ -27,7 +27,8 @@ export const ICONS = {
   Gift:require('./icons/Gift.png'),
   Service:require('./icons/service.png'),
   Promos:require('./icons/promos.png'),
-  search:require('./icons/searchIcon.png'),
+  search:require('./icons/search.png'),
+  heart_fill:require('./icons/heart_fill.png'),
   
   // Social ICONS
   apple: require('./icons/apple.svg'),
@@ -110,7 +111,7 @@ export const ICONS = {
   
   // UI Components
   searchIcon: require('./icons/searchIcon.png'),
-  heart: require('./icons/heart.svg'),
+  heart: require('./icons/heart.png'),
   bin: require('./icons/Bin.svg'),
   delete: require('./icons/delete.svg'),
   deletePng: require('./icons/delete.png'),
