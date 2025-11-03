@@ -112,7 +112,7 @@ const ServiceScreen: React.FC = () => {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, { backgroundColor: colors.whiteBackground || '#FFFFFF' }]}
+      style={styles.container}
     >
       {/* App Bar */}
       <AppBar
@@ -123,21 +123,11 @@ const ServiceScreen: React.FC = () => {
 
       {/* Content */}
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          padding: spacing.md || 16,
-          paddingBottom: 100, // Space for bottom tab
-        }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <AppText
-          style={{
-            fontSize: 28,
-            fontWeight: 'bold',
-            color: colors.primaryText || '#000000',
-            marginBottom: spacing.lg || 24,
-          }}
-        >
+        <AppText style={styles.title}>
           Our Services
         </AppText>
 
@@ -147,94 +137,38 @@ const ServiceScreen: React.FC = () => {
             onPress={() => handleServicePress(service)}
             disabled={!service.available}
             style={[
-              {
-                backgroundColor: colors.whiteBackground || '#FFFFFF',
-                borderRadius: borderRadius.md || 12,
-                padding: spacing.md || 16,
-                marginBottom: spacing.md || 16,
-                borderWidth: 1,
-                borderColor: service.available
-                  ? colors.greyBackground || '#F5F5F5'
-                  : colors.greyBackground || '#E0E0E0',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 3,
-                opacity: service.available ? 1 : 0.6,
-              },
+              styles.serviceCard,
+              service.available ? styles.serviceCardAvailable : styles.serviceCardUnavailable,
             ]}
             activeOpacity={0.7}
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: spacing.sm || 8,
-              }}
-            >
+            <View style={styles.serviceCardHeader}>
               {service.icon && (
-                <AppText
-                  style={{
-                    fontSize: 32,
-                    marginRight: spacing.md || 12,
-                  }}
-                >
+                <AppText style={styles.serviceIcon}>
                   {service.icon}
                 </AppText>
               )}
-              <View style={{ flex: 1 }}>
-                <AppText
-                  style={{
-                    fontSize: 18,
-                    fontWeight: '600',
-                    color: colors.primaryText || '#000000',
-                  }}
-                >
+              <View style={styles.serviceCardDetails}>
+                <AppText style={styles.serviceTitle}>
                   {service.title}
                 </AppText>
                 {!service.available && (
-                  <AppText
-                    style={{
-                      fontSize: 12,
-                      color: colors.error || '#FF4444',
-                      marginTop: spacing.xs || 4,
-                    }}
-                  >
+                  <AppText style={styles.unavailableText}>
                     Currently Unavailable
                   </AppText>
                 )}
               </View>
             </View>
 
-            <AppText
-              style={{
-                fontSize: 14,
-                color: colors.greyText || '#666666',
-                lineHeight: 20,
-              }}
-            >
+            <AppText style={styles.serviceDescription}>
               {service.description}
             </AppText>
           </TouchableOpacity>
         ))}
 
         {services.length === 0 && (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingVertical: spacing.xl || 40,
-            }}
-          >
-            <AppText
-              style={{
-                fontSize: 16,
-                color: colors.greyText || '#666666',
-                textAlign: 'center',
-              }}
-            >
+          <View style={styles.emptyStateContainer}>
+            <AppText style={styles.emptyStateText}>
               No services available at the moment
             </AppText>
           </View>

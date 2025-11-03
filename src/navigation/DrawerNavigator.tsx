@@ -10,9 +10,6 @@ export type DrawerParamList = {
   MainTabs: undefined;
 };
 
-// Re-export for consistency
-export { DrawerParamList };
-
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
 const DrawerNavigator: React.FC = () => {
@@ -41,7 +38,7 @@ const DrawerNavigator: React.FC = () => {
       )}
       screenOptions={{
         headerShown: false,
-        drawerType: 'slide',
+        drawerType: 'front', // Drawer opens over content instead of sliding it
         drawerStyle: {
           width: 280,
           backgroundColor: colors.whiteBackground || '#FFFFFF',
@@ -49,6 +46,7 @@ const DrawerNavigator: React.FC = () => {
         overlayColor: 'rgba(0, 0, 0, 0.5)',
         drawerActiveTintColor: colors.primary || '#FF6B35',
         drawerInactiveTintColor: colors.greyText || '#666666',
+        drawerPosition: 'left',
       }}
     >
       <Drawer.Screen

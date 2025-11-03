@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 import AppText from '../ui/AppText';
+import createStyles from './styles';
 
 export interface CategoryErrorFallbackProps {
   error: Error;
@@ -18,44 +19,26 @@ export const CategoryErrorFallback: React.FC<CategoryErrorFallbackProps> = ({
 }) => {
   const { colors, spacing, borderRadius } = useTheme();
 
+  const styles = useMemo(
+    () => createStyles(colors, spacing, borderRadius),
+    [colors, spacing, borderRadius]
+  );
+
   if (!colors || !spacing || !borderRadius) {
     return null;
   }
 
   return (
-    <View
-      style={{
-        paddingVertical: spacing.md || 16,
-        paddingHorizontal: spacing.md || 16,
-        backgroundColor: colors.greyBackground || '#F5F5F5',
-        borderRadius: borderRadius.md || 8,
-        marginHorizontal: spacing.md || 16,
-        marginVertical: spacing.sm || 8,
-        alignItems: 'center',
-      }}
-    >
-      <AppText
-        style={{
-          fontSize: 14,
-          color: colors.error || '#FF4444',
-          marginBottom: spacing.xs || 4,
-          textAlign: 'center',
-        }}
-      >
+    <View style={styles.categoryContainer}>
+      <AppText style={styles.categoryErrorText}>
         ⚠️ Failed to load categories
       </AppText>
       <TouchableOpacity
-        style={{
-          backgroundColor: colors.primary || '#FF6B35',
-          paddingHorizontal: spacing.md || 16,
-          paddingVertical: spacing.xs || 8,
-          borderRadius: borderRadius.sm || 4,
-          marginTop: spacing.xs || 4,
-        }}
+        style={styles.categoryRetryButton}
         onPress={resetError}
         activeOpacity={0.7}
       >
-        <AppText style={{ color: colors.whiteText || '#FFFFFF', fontSize: 12, fontWeight: '600' }}>
+        <AppText style={styles.categoryRetryButtonText}>
           Retry
         </AppText>
       </TouchableOpacity>

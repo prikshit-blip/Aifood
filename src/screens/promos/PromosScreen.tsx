@@ -1,82 +1,36 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import React, { Suspense, useState, useMemo, useCallback } from 'react';
+import { View, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { DrawerActions } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { BottomTabParamList } from '../../navigation/types';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
+import { useDrawerNavigation } from '../../hooks/useDrawerNavigation';
+import ErrorBoundary from 'react-native-error-boundary';
 import {
   AppBar,
 } from '../../components/home';
 import AppText from '../../components/ui/AppText';
+import Shimmer from '../../components/ui/Shimmer';
+import { ErrorFallback } from '../../components/ErrorBoundary';
+import { AsyncPromoList, type Promo } from './AsyncPromoList';
 import createStyles from './styles';
 
 type PromosScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Promos'>;
 
-interface Promo {
-  id: string;
-  title: string;
-  description: string;
-  discount?: string;
-  imageUrl?: string;
-  validUntil?: string;
-  code?: string;
-}
-
 const PromosScreen: React.FC = () => {
   const navigation = useNavigation<PromosScreenNavigationProp>();
   const { colors, spacing, borderRadius } = useTheme();
-
-  // No local state needed for drawer
-
-  // Mock promo data
-  const promos: Promo[] = useMemo(
-    () => [
-      {
-        id: '1',
-        title: '50% Off on All Burgers',
-        description: 'Get 50% discount on all burger items. Valid until end of month.',
-        discount: '50% OFF',
-        validUntil: '2024-12-31',
-        code: 'BURGER50',
-      },
-      {
-        id: '2',
-        title: 'Free Delivery',
-        description: 'Free delivery on orders above $50. Use code at checkout.',
-        discount: 'FREE',
-        validUntil: '2024-12-31',
-        code: 'FREEDEL',
-      },
-      {
-        id: '3',
-        title: 'Buy 2 Get 1 Free',
-        description: 'Buy any 2 items and get 1 free. Limited time offer!',
-        discount: 'B2G1',
-        validUntil: '2024-12-31',
-        code: 'B2G1FREE',
-      },
-      {
-        id: '4',
-        title: 'Weekend Special',
-        description: '20% off on weekends. Every Saturday and Sunday.',
-        discount: '20% OFF',
-        validUntil: '2024-12-31',
-        code: 'WEEKEND20',
-      },
-    ],
-    []
-  );
+  const { openDrawer } = useDrawerNavigation();
+  
+  // State to control demo mode (toggle between async and sync)
+  const [useAsyncDemo, setUseAsyncDemo] = useState(true);
 
   // ========== Handlers ==========
   const handleDrawerOpen = useCallback(() => {
-    const rootNavigation = navigation.getParent()?.getParent();
-    if (rootNavigation) {
-      rootNavigation.dispatch(DrawerActions.openDrawer());
-    }
-  }, [navigation]);
+    openDrawer();
+  }, [openDrawer]);
 
   const handleNotificationPress = useCallback(() => {
     Alert.alert('Notifications', 'No new notifications');
@@ -99,7 +53,7 @@ const PromosScreen: React.FC = () => {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, { backgroundColor: colors.whiteBackground || '#FFFFFF' }]}
+      style={styles.container}
     >
       {/* App Bar */}
       <AppBar
@@ -109,160 +63,120 @@ const PromosScreen: React.FC = () => {
       />
 
       {/* Content */}
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          padding: spacing.md || 16,
-          paddingBottom: 100, // Space for bottom tab
+      {/* 
+        SUSPENSE WORKING DEMONSTRATION:
+        
+        ═══════════════════════════════════════════════════════════
+        HOW SUSPENSE WORKS:
+        ═══════════════════════════════════════════════════════════
+        
+        1. Suspense wraps AsyncPromoList component
+        2. AsyncPromoList uses use(promosPromise) to read the promise
+        3. If promise is PENDING:
+           → React throws the promise
+           → Suspense catches it
+           → Shows fallback UI (Shimmer loading states)
+        
+        4. When promise RESOLVES:
+           → React re-renders AsyncPromoList
+           → Component receives data
+           → Renders actual promo cards
+        
+        ═══════════════════════════════════════════════════════════
+        FALLBACK UI (Shown while loading):
+        ═══════════════════════════════════════════════════════════
+        - Shimmer placeholders for title
+        - Shimmer placeholders for 4 promo cards
+        - Matches the structure of actual content
+        - Provides smooth loading experience
+        ═══════════════════════════════════════════════════════════
+      */}
+      <ErrorBoundary
+        onError={(error: Error, stackTrace: string) => {
+          console.error('🛡️ ErrorBoundary caught error in PromosScreen:', error, stackTrace);
+          // You can also send error to error reporting service here
+          // Example: Sentry.captureException(error, { extra: { stackTrace } });
         }}
-        showsVerticalScrollIndicator={false}
-      >
-        <AppText
-          style={{
-            fontSize: 28,
-            fontWeight: 'bold',
-            color: colors.primaryText || '#000000',
-            marginBottom: spacing.lg || 24,
-          }}
-        >
-          Promotions & Offers
-        </AppText>
-
-        {promos.map((promo) => (
-          <TouchableOpacity
-            key={promo.id}
-            onPress={() => handlePromoPress(promo)}
-            style={[
-              {
-                backgroundColor: colors.whiteBackground || '#FFFFFF',
-                borderRadius: borderRadius.md || 12,
-                padding: spacing.md || 16,
-                marginBottom: spacing.md || 16,
-                borderWidth: 1,
-                borderColor: colors.greyBackground || '#F5F5F5',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 3,
-              },
-            ]}
-            activeOpacity={0.7}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: spacing.sm || 8,
-              }}
-            >
-              <AppText
-                style={{
-                  fontSize: 18,
-                  fontWeight: '600',
-                  color: colors.primaryText || '#000000',
-                  flex: 1,
-                }}
-              >
-                {promo.title}
-              </AppText>
-              {promo.discount && (
-                <View
-                  style={{
-                    backgroundColor: colors.primary || '#FF6B35',
-                    paddingHorizontal: spacing.sm || 12,
-                    paddingVertical: spacing.xs || 6,
-                    borderRadius: borderRadius.sm || 6,
-                  }}
-                >
-                  <AppText
-                    style={{
-                      fontSize: 12,
-                      fontWeight: '700',
-                      color: colors.whiteText || '#FFFFFF',
-                    }}
-                  >
-                    {promo.discount}
-                  </AppText>
-                </View>
-              )}
-            </View>
-
-            <AppText
-              style={{
-                fontSize: 14,
-                color: colors.greyText || '#666666',
-                marginBottom: spacing.sm || 8,
-              }}
-            >
-              {promo.description}
-            </AppText>
-
-            {promo.code && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: spacing.xs || 4,
-                }}
-              >
-                <AppText
-                  style={{
-                    fontSize: 12,
-                    color: colors.greyText || '#666666',
-                    marginRight: spacing.xs || 4,
-                  }}
-                >
-                  Code:
-                </AppText>
-                <AppText
-                  style={{
-                    fontSize: 14,
-                    fontWeight: '600',
-                    color: colors.primary || '#FF6B35',
-                  }}
-                >
-                  {promo.code}
-                </AppText>
-              </View>
-            )}
-
-            {promo.validUntil && (
-              <AppText
-                style={{
-                  fontSize: 11,
-                  color: colors.greyText || '#999999',
-                  marginTop: spacing.xs || 4,
-                }}
-              >
-                Valid until: {promo.validUntil}
-              </AppText>
-            )}
-          </TouchableOpacity>
-        ))}
-
-        {promos.length === 0 && (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingVertical: spacing.xl || 40,
-            }}
-          >
-            <AppText
-              style={{
-                fontSize: 16,
-                color: colors.greyText || '#666666',
-                textAlign: 'center',
-              }}
-            >
-              No promotions available at the moment
-            </AppText>
-          </View>
+        FallbackComponent={(props) => (
+          <ErrorFallback
+            {...props}
+            header="⚠️ Failed to Load Promotions"
+            message="An unexpected error occurred while loading promotions"
+            screenName="PromosScreen"
+            buttonText="Try Again"
+          />
         )}
-      </ScrollView>
+      >
+        <Suspense
+          fallback={
+            <ScrollView
+              style={styles.suspenseFallbackScrollView}
+              contentContainerStyle={styles.scrollViewContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {/* Loading State: Shimmer UI */}
+              <Shimmer width="60%" height={32} borderRadius={8} style={{ marginBottom: spacing?.lg || 24 }} />
+              {[1, 2, 3, 4].map((item) => (
+                <View key={item} style={styles.shimmerCard}>
+                  <View style={styles.shimmerRow}>
+                    <Shimmer width="70%" height={20} borderRadius={4} />
+                    <Shimmer width={60} height={24} borderRadius={6} />
+                  </View>
+                  <Shimmer width="100%" height={16} borderRadius={4} style={{ marginBottom: spacing?.xs || 4 }} />
+                  <Shimmer width="90%" height={16} borderRadius={4} style={{ marginBottom: spacing?.sm || 8 }} />
+                  <View style={styles.shimmerCodeRow}>
+                    <Shimmer width={40} height={14} borderRadius={4} style={{ marginRight: spacing?.xs || 4 }} />
+                    <Shimmer width={80} height={14} borderRadius={4} />
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          }
+        >
+          {/* Actual Content: AsyncPromoList component */}
+          <ErrorBoundary
+            onError={(error: Error, stackTrace: string) => {
+              console.error('🛡️ ErrorBoundary caught error in AsyncPromoList:', error, stackTrace);
+            }}
+            FallbackComponent={(props) => (
+              <ErrorFallback
+                {...props}
+                header="⚠️ Failed to Load Promo List"
+                message="Unable to load the promotions list"
+                screenName="PromosScreen - AsyncPromoList"
+                buttonText="Retry"
+              />
+            )}
+          >
+            <ScrollView
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollViewContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {useAsyncDemo ? (
+                // Async version - uses Suspense
+                <AsyncPromoList
+                  onPromoPress={handlePromoPress}
+                  colors={colors}
+                  spacing={spacing}
+                  borderRadius={borderRadius}
+                  styles={styles}
+                />
+              ) : (
+                // Sync version - immediate render (for comparison)
+                <>
+                  <AppText style={styles.syncModeTitle}>
+                    Promotions & Offers (Sync Mode)
+                  </AppText>
+                  <AppText style={styles.syncModeDescription}>
+                    Switch to async mode to see Suspense in action!
+                  </AppText>
+                </>
+              )}
+            </ScrollView>
+          </ErrorBoundary>
+        </Suspense>
+      </ErrorBoundary>
     </SafeAreaView>
   );
 };

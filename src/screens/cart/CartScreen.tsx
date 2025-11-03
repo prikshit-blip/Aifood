@@ -167,7 +167,7 @@ const CartScreen: React.FC = () => {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, { backgroundColor: colors.whiteBackground || '#FFFFFF' }]}
+      style={styles.container}
     >
       {/* App Bar */}
       <AppBar
@@ -178,170 +178,59 @@ const CartScreen: React.FC = () => {
 
       {/* Content */}
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          padding: spacing.md || 16,
-          paddingBottom: 160, // Space for bottom tab and checkout button
-        }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <AppText
-          style={{
-            fontSize: 28,
-            fontWeight: 'bold',
-            color: colors.primaryText || '#000000',
-            marginBottom: spacing.lg || 24,
-          }}
-        >
+        <AppText style={styles.title}>
           Your Cart
         </AppText>
 
         {cartItems.length > 0 ? (
           <>
             {cartItems.map((item) => (
-              <View
-                key={item.id}
-                style={[
-                  {
-                    backgroundColor: colors.whiteBackground || '#FFFFFF',
-                    borderRadius: borderRadius.md || 12,
-                    padding: spacing.md || 16,
-                    marginBottom: spacing.md || 16,
-                    borderWidth: 1,
-                    borderColor: colors.greyBackground || '#F5F5F5',
-                    shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 4,
-                    elevation: 3,
-                  },
-                ]}
-              >
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: spacing.sm || 8,
-                  }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <AppText
-                      style={{
-                        fontSize: 18,
-                        fontWeight: '600',
-                        color: colors.primaryText || '#000000',
-                        marginBottom: spacing.xs || 4,
-                      }}
-                    >
+              <View key={item.id} style={styles.cartItemCard}>
+                <View style={styles.cartItemHeader}>
+                  <View style={styles.cartItemDetails}>
+                    <AppText style={styles.cartItemTitle}>
                       {item.product.title}
                     </AppText>
                     {item.product.subHeading && (
-                      <AppText
-                        style={{
-                          fontSize: 14,
-                          color: colors.greyText || '#666666',
-                          marginBottom: spacing.xs || 4,
-                        }}
-                      >
+                      <AppText style={styles.cartItemSubHeading}>
                         {item.product.subHeading}
                       </AppText>
                     )}
-                    <AppText
-                      style={{
-                        fontSize: 16,
-                        fontWeight: '600',
-                        color: colors.primary || '#FF6B35',
-                        marginTop: spacing.xs || 4,
-                      }}
-                    >
+                    <AppText style={styles.cartItemPrice}>
                       ${item.product.price.toFixed(2)}
                     </AppText>
                   </View>
                   <TouchableOpacity
                     onPress={() => handleRemoveItem(item.id)}
-                    style={{
-                      padding: spacing.xs || 4,
-                    }}
+                    style={styles.removeButton}
                   >
-                    <AppText style={{ fontSize: 20 }}>🗑️</AppText>
+                    <AppText style={styles.removeIcon}>🗑️</AppText>
                   </TouchableOpacity>
                 </View>
 
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginTop: spacing.sm || 8,
-                    paddingTop: spacing.sm || 8,
-                    borderTopWidth: 1,
-                    borderTopColor: colors.greyBackground || '#F5F5F5',
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      backgroundColor: colors.greyBackground || '#F5F5F5',
-                      borderRadius: borderRadius.sm || 8,
-                      paddingVertical: spacing.xs || 4,
-                    }}
-                  >
+                <View style={styles.cartItemFooter}>
+                  <View style={styles.quantityContainer}>
                     <TouchableOpacity
                       onPress={() => handleQuantityChange(item.id, item.quantity - 1)}
-                      style={{
-                        paddingHorizontal: spacing.sm || 12,
-                        paddingVertical: spacing.xs || 4,
-                      }}
+                      style={styles.quantityButton}
                     >
-                      <AppText
-                        style={{
-                          fontSize: 18,
-                          fontWeight: '600',
-                          color: colors.primaryText || '#000000',
-                        }}
-                      >
-                        −
-                      </AppText>
+                      <AppText style={styles.quantityButtonText}>−</AppText>
                     </TouchableOpacity>
-                    <AppText
-                      style={{
-                        fontSize: 16,
-                        fontWeight: '600',
-                        color: colors.primaryText || '#000000',
-                        paddingHorizontal: spacing.md || 16,
-                        minWidth: 40,
-                        textAlign: 'center',
-                      }}
-                    >
+                    <AppText style={styles.quantityText}>
                       {item.quantity}
                     </AppText>
                     <TouchableOpacity
                       onPress={() => handleQuantityChange(item.id, item.quantity + 1)}
-                      style={{
-                        paddingHorizontal: spacing.sm || 12,
-                        paddingVertical: spacing.xs || 4,
-                      }}
+                      style={styles.quantityButton}
                     >
-                      <AppText
-                        style={{
-                          fontSize: 18,
-                          fontWeight: '600',
-                          color: colors.primaryText || '#000000',
-                        }}
-                      >
-                        +
-                      </AppText>
+                      <AppText style={styles.quantityButtonText}>+</AppText>
                     </TouchableOpacity>
                   </View>
-                  <AppText
-                    style={{
-                      fontSize: 18,
-                      fontWeight: '700',
-                      color: colors.primaryText || '#000000',
-                    }}
-                  >
+                  <AppText style={styles.subtotal}>
                     ${item.subtotal.toFixed(2)}
                   </AppText>
                 </View>
@@ -349,164 +238,53 @@ const CartScreen: React.FC = () => {
             ))}
 
             {/* Order Summary */}
-            <View
-              style={[
-                {
-                  backgroundColor: colors.whiteBackground || '#FFFFFF',
-                  borderRadius: borderRadius.md || 12,
-                  padding: spacing.md || 16,
-                  marginTop: spacing.md || 16,
-                  borderWidth: 1,
-                  borderColor: colors.greyBackground || '#F5F5F5',
-                },
-              ]}
-            >
-              <AppText
-                style={{
-                  fontSize: 20,
-                  fontWeight: '600',
-                  color: colors.primaryText || '#000000',
-                  marginBottom: spacing.md || 16,
-                }}
-              >
+            <View style={styles.orderSummaryCard}>
+              <AppText style={styles.orderSummaryTitle}>
                 Order Summary
               </AppText>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginBottom: spacing.sm || 8,
-                }}
-              >
-                <AppText
-                  style={{
-                    fontSize: 14,
-                    color: colors.greyText || '#666666',
-                  }}
-                >
+              <View style={styles.orderSummaryRow}>
+                <AppText style={styles.orderSummaryLabel}>
                   Subtotal ({cartItemCount} items)
                 </AppText>
-                <AppText
-                  style={{
-                    fontSize: 14,
-                    color: colors.primaryText || '#000000',
-                  }}
-                >
+                <AppText style={styles.orderSummaryValue}>
                   ${cartTotal.toFixed(2)}
                 </AppText>
               </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginBottom: spacing.sm || 8,
-                }}
-              >
-                <AppText
-                  style={{
-                    fontSize: 14,
-                    color: colors.greyText || '#666666',
-                  }}
-                >
+              <View style={styles.orderSummaryRow}>
+                <AppText style={styles.orderSummaryLabel}>
                   Delivery Fee
                 </AppText>
-                <AppText
-                  style={{
-                    fontSize: 14,
-                    color: colors.primaryText || '#000000',
-                  }}
-                >
+                <AppText style={styles.orderSummaryValue}>
                   $5.00
                 </AppText>
               </View>
-              <View
-                style={{
-                  height: 1,
-                  backgroundColor: colors.greyBackground || '#F5F5F5',
-                  marginVertical: spacing.sm || 8,
-                }}
-              />
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <AppText
-                  style={{
-                    fontSize: 20,
-                    fontWeight: '700',
-                    color: colors.primaryText || '#000000',
-                  }}
-                >
+              <View style={styles.orderSummaryDivider} />
+              <View style={styles.orderSummaryTotalRow}>
+                <AppText style={styles.orderSummaryTotalLabel}>
                   Total
                 </AppText>
-                <AppText
-                  style={{
-                    fontSize: 20,
-                    fontWeight: '700',
-                    color: colors.primary || '#FF6B35',
-                  }}
-                >
+                <AppText style={styles.orderSummaryTotalValue}>
                   ${(cartTotal + 5.0).toFixed(2)}
                 </AppText>
               </View>
             </View>
           </>
         ) : (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingVertical: spacing.xl || 40,
-            }}
-          >
-            <AppText
-              style={{
-                fontSize: 48,
-                marginBottom: spacing.md || 16,
-              }}
-            >
+          <View style={styles.emptyStateContainer}>
+            <AppText style={styles.emptyStateIcon}>
               🛒
             </AppText>
-            <AppText
-              style={{
-                fontSize: 20,
-                fontWeight: '600',
-                color: colors.primaryText || '#000000',
-                marginBottom: spacing.sm || 8,
-                textAlign: 'center',
-              }}
-            >
+            <AppText style={styles.emptyStateTitle}>
               Your cart is empty
             </AppText>
-            <AppText
-              style={{
-                fontSize: 14,
-                color: colors.greyText || '#666666',
-                textAlign: 'center',
-                marginBottom: spacing.lg || 24,
-              }}
-            >
+            <AppText style={styles.emptyStateText}>
               Add items to your cart to get started
             </AppText>
             <TouchableOpacity
               onPress={() => navigation.navigate('Home')}
-              style={{
-                backgroundColor: colors.primary || '#FF6B35',
-                paddingHorizontal: spacing.lg || 24,
-                paddingVertical: spacing.md || 12,
-                borderRadius: borderRadius.md || 8,
-              }}
+              style={styles.emptyStateButton}
             >
-              <AppText
-                style={{
-                  color: colors.whiteText || '#FFFFFF',
-                  fontSize: 16,
-                  fontWeight: '600',
-                }}
-              >
+              <AppText style={styles.emptyStateButtonText}>
                 Start Shopping
               </AppText>
             </TouchableOpacity>
@@ -516,34 +294,12 @@ const CartScreen: React.FC = () => {
 
       {/* Checkout Button - Fixed at bottom */}
       {cartItems.length > 0 && (
-        <View
-          style={{
-            position: 'absolute',
-            bottom: 80,
-            left: 0,
-            right: 0,
-            padding: spacing.md || 16,
-            backgroundColor: colors.whiteBackground || '#FFFFFF',
-            borderTopWidth: 1,
-            borderTopColor: colors.greyBackground || '#F5F5F5',
-          }}
-        >
+        <View style={styles.checkoutButtonContainer}>
           <TouchableOpacity
             onPress={handleCheckout}
-            style={{
-              backgroundColor: colors.primary || '#FF6B35',
-              paddingVertical: spacing.md || 16,
-              borderRadius: borderRadius.md || 8,
-              alignItems: 'center',
-            }}
+            style={styles.checkoutButton}
           >
-            <AppText
-              style={{
-                color: colors.whiteText || '#FFFFFF',
-                fontSize: 18,
-                fontWeight: '700',
-              }}
-            >
+            <AppText style={styles.checkoutButtonText}>
               Proceed to Checkout
             </AppText>
           </TouchableOpacity>

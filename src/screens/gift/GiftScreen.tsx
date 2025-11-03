@@ -110,7 +110,7 @@ const GiftScreen: React.FC = () => {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, { backgroundColor: colors.whiteBackground || '#FFFFFF' }]}
+      style={styles.container}
     >
       {/* App Bar */}
       <AppBar
@@ -121,30 +121,14 @@ const GiftScreen: React.FC = () => {
 
       {/* Content */}
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          padding: spacing.md || 16,
-          paddingBottom: 100, // Space for bottom tab
-        }}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <AppText
-          style={{
-            fontSize: 28,
-            fontWeight: 'bold',
-            color: colors.primaryText || '#000000',
-            marginBottom: spacing.sm || 8,
-          }}
-        >
+        <AppText style={styles.title}>
           Gift Cards
         </AppText>
-        <AppText
-          style={{
-            fontSize: 14,
-            color: colors.greyText || '#666666',
-            marginBottom: spacing.lg || 24,
-          }}
-        >
+        <AppText style={styles.description}>
           Give the gift of great food. Choose a gift card for your loved ones.
         </AppText>
 
@@ -154,80 +138,28 @@ const GiftScreen: React.FC = () => {
             onPress={() => handleGiftCardPress(giftCard)}
             disabled={!giftCard.available}
             style={[
-              {
-                backgroundColor: colors.whiteBackground || '#FFFFFF',
-                borderRadius: borderRadius.md || 12,
-                padding: spacing.md || 16,
-                marginBottom: spacing.md || 16,
-                borderWidth: 2,
-                borderColor: giftCard.available
-                  ? colors.primary || '#FF6B35'
-                  : colors.greyBackground || '#E0E0E0',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 3,
-                opacity: giftCard.available ? 1 : 0.6,
-              },
+              styles.giftCard,
+              giftCard.available ? styles.giftCardAvailable : styles.giftCardUnavailable,
             ]}
             activeOpacity={0.7}
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <View style={{ flex: 1 }}>
-                <AppText
-                  style={{
-                    fontSize: 20,
-                    fontWeight: '600',
-                    color: colors.primaryText || '#000000',
-                    marginBottom: spacing.xs || 4,
-                  }}
-                >
+            <View style={styles.giftCardContent}>
+              <View style={styles.giftCardDetails}>
+                <AppText style={styles.giftCardTitle}>
                   {giftCard.title}
                 </AppText>
-                <AppText
-                  style={{
-                    fontSize: 14,
-                    color: colors.greyText || '#666666',
-                    marginBottom: spacing.sm || 8,
-                  }}
-                >
+                <AppText style={styles.giftCardDescription}>
                   {giftCard.description}
                 </AppText>
                 {!giftCard.available && (
-                  <AppText
-                    style={{
-                      fontSize: 12,
-                      color: colors.error || '#FF4444',
-                      marginTop: spacing.xs || 4,
-                    }}
-                  >
+                  <AppText style={styles.unavailableText}>
                     Currently Unavailable
                   </AppText>
                 )}
               </View>
               {giftCard.value > 0 && (
-                <View
-                  style={{
-                    backgroundColor: colors.primary || '#FF6B35',
-                    paddingHorizontal: spacing.md || 16,
-                    paddingVertical: spacing.sm || 8,
-                    borderRadius: borderRadius.sm || 8,
-                  }}
-                >
-                  <AppText
-                    style={{
-                      fontSize: 18,
-                      fontWeight: '700',
-                      color: colors.whiteText || '#FFFFFF',
-                    }}
-                  >
+                <View style={styles.giftCardValue}>
+                  <AppText style={styles.giftCardValueText}>
                     ${giftCard.value}
                   </AppText>
                 </View>
@@ -237,21 +169,8 @@ const GiftScreen: React.FC = () => {
         ))}
 
         {giftCards.length === 0 && (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingVertical: spacing.xl || 40,
-            }}
-          >
-            <AppText
-              style={{
-                fontSize: 16,
-                color: colors.greyText || '#666666',
-                textAlign: 'center',
-              }}
-            >
+          <View style={styles.emptyStateContainer}>
+            <AppText style={styles.emptyStateText}>
               No gift cards available at the moment
             </AppText>
           </View>

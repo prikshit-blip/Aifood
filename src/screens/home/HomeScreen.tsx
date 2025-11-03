@@ -2,11 +2,11 @@ import React, { Suspense, useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { DrawerActions } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { BottomTabParamList } from '../../navigation/types';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
+import { useDrawerNavigation } from '../../hooks/useDrawerNavigation';
 import {
   AppBar,
   MenuHeader,
@@ -34,6 +34,7 @@ const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors, spacing, borderRadius } = useTheme();
   const { user, logout } = useAuth();
+  const { openDrawer } = useDrawerNavigation();
 
   // ========== State Management ==========
   const [state, setState] = useState<Omit<HomeScreenState, 'activeTab' | 'isDrawerOpen'>>({
@@ -212,11 +213,8 @@ const HomeScreen: React.FC = () => {
   }, []);
 
   const handleDrawerOpen = useCallback(() => {
-    const rootNavigation = navigation.getParent()?.getParent();
-    if (rootNavigation) {
-      rootNavigation.dispatch(DrawerActions.openDrawer());
-    }
-  }, [navigation]);
+    openDrawer();
+  }, [openDrawer]);
 
   const handleNotificationPress = useCallback(() => {
     Alert.alert('Notifications', 'No new notifications');
@@ -258,53 +256,28 @@ const HomeScreen: React.FC = () => {
   // ========== Error Fallback Component ==========
   const ErrorFallback = ({ error, resetError }: { error: Error; resetError: () => void }) => {
     const { colors, spacing, borderRadius } = useTheme();
+    const errorStyles = useMemo(
+      () => createStyles(colors, spacing, borderRadius),
+      [colors, spacing, borderRadius]
+    );
     
     if (!colors || !spacing || !borderRadius) {
       return null;
     }
 
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: spacing.lg || 20,
-          backgroundColor: colors.whiteBackground || '#FFFFFF',
-        }}
-      >
-        <AppText
-          style={{
-            fontSize: 24,
-            fontWeight: 'bold',
-            color: colors.primaryText || '#000000',
-            marginBottom: spacing.md || 12,
-            textAlign: 'center',
-          }}
-        >
+      <View style={errorStyles.errorContainer}>
+        <AppText style={errorStyles.errorHeader}>
           ⚠️ Something went wrong
         </AppText>
-        <AppText
-          style={{
-            fontSize: 16,
-            color: colors.greyText || '#666666',
-            marginBottom: spacing.md || 8,
-            textAlign: 'center',
-          }}
-        >
+        <AppText style={errorStyles.errorMessage}>
           {error?.message || 'An unexpected error occurred in ProductList'}
         </AppText>
         <TouchableOpacity
-          style={{
-            backgroundColor: colors.primary || '#FF6B35',
-            paddingHorizontal: spacing.lg || 24,
-            paddingVertical: spacing.md || 12,
-            borderRadius: borderRadius.md || 8,
-            marginTop: spacing.md || 16,
-          }}
+          style={errorStyles.errorButton}
           onPress={resetError}
         >
-          <AppText style={{ color: colors.whiteText || '#FFFFFF', fontSize: 16, fontWeight: '600' }}>
+          <AppText style={errorStyles.errorButtonText}>
             Try Again
           </AppText>
         </TouchableOpacity>
@@ -339,23 +312,18 @@ const HomeScreen: React.FC = () => {
     return (
       <SafeAreaView
         edges={['top']}
-        style={[styles.container, { backgroundColor: colors.whiteBackground || '#FFFFFF', justifyContent: 'center', alignItems: 'center' }]}
+        style={styles.menuErrorContainer}
       >
-        <AppText style={{ fontSize: 16, color: colors.error, marginBottom: spacing.md }}>
+        <AppText style={styles.menuErrorText}>
           Failed to load menu. Please try again.
         </AppText>
         <TouchableOpacity
-          style={{
-            backgroundColor: colors.primary,
-            paddingHorizontal: spacing.lg,
-            paddingVertical: spacing.md,
-            borderRadius: borderRadius.md,
-          }}
+          style={styles.menuErrorButton}
           onPress={() => {
             Alert.alert('Info', 'Please refresh the app');
           }}
         >
-          <AppText style={{ color: colors.whiteText, fontSize: 16, fontWeight: '600' }}>
+          <AppText style={styles.menuErrorButtonText}>
             OK
           </AppText>
         </TouchableOpacity>
@@ -366,7 +334,7 @@ const HomeScreen: React.FC = () => {
   return (
     <SafeAreaView
       edges={['top']}
-      style={[styles.container, { backgroundColor: colors.whiteBackground || '#FFFFFF' }]}
+      style={styles.container}
     >
       {/* App Bar */}
       <AppBar

@@ -78,6 +78,23 @@ export const createStyles = (
       gap: spacing?.md || 15,
       width: '100%',
     },
+    shimmerTitle: {
+      marginBottom: spacing?.md || 16,
+    },
+    shimmerDescription: {
+      marginBottom: spacing?.xs || 4,
+    },
+    shimmerButton: {
+      marginBottom: spacing?.md || 16,
+    },
+    shimmerIllustration: {
+      width: width,
+      height: height * 0.6,
+      borderRadius: 0,
+    },
+    buttonFullWidth: {
+      width: '100%',
+    },
     button: {
       width: '100%',
       height: 56,

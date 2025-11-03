@@ -1,9 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
-  StyleSheet,
   TouchableOpacity,
-  ScrollView,
 } from 'react-native';
 import {
   DrawerContentScrollView,
@@ -15,6 +13,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Alert } from 'react-native';
 import AppText from '../ui/AppText';
 import { DrawerItem } from '../../types/home';
+import createStyles from './CustomDrawerContent.styles';
 
 interface CustomDrawerContentProps extends DrawerContentComponentProps {
   user?: {
@@ -31,6 +30,11 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
 }) => {
   const { colors, spacing, borderRadius } = useTheme();
   const { logout } = useAuth();
+
+  const styles = useMemo(
+    () => createStyles(colors, spacing, borderRadius),
+    [colors, spacing, borderRadius]
+  );
 
   if (!colors || !spacing || !borderRadius) {
     return null;
@@ -87,58 +91,21 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
   return (
     <DrawerContentScrollView
       {...props}
-      contentContainerStyle={{
-        flex: 1,
-        paddingTop: spacing.xl || 40,
-        paddingHorizontal: spacing.lg || 20,
-      }}
+      contentContainerStyle={styles.contentContainer}
     >
       {/* User Info Section */}
       {user && (
-        <View
-          style={[
-            styles.userSection,
-            {
-              paddingBottom: spacing.lg || 20,
-              marginBottom: spacing.lg || 20,
-              borderBottomWidth: 1,
-              borderBottomColor: colors.greyBackground || '#F5F5F5',
-            },
-          ]}
-        >
-          <View
-            style={[
-              styles.avatar,
-              {
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                backgroundColor: colors.secondaryBackground || '#FFF5F0',
-              },
-            ]}
-          >
-            <AppText style={{ fontSize: 24 }}>👤</AppText>
+        <View style={styles.userSection}>
+          <View style={styles.avatar}>
+            <AppText style={styles.avatarIcon}>👤</AppText>
           </View>
           {user.name && (
-            <AppText
-              style={{
-                fontSize: 18,
-                fontWeight: '600',
-                color: colors.primaryText || '#000000',
-                marginTop: spacing.sm || 8,
-              }}
-            >
+            <AppText style={styles.userName}>
               {user.name}
             </AppText>
           )}
           {user.email && (
-            <AppText
-              style={{
-                fontSize: 14,
-                color: colors.greyText || '#666666',
-                marginTop: spacing.xs || 4,
-              }}
-            >
+            <AppText style={styles.userEmail}>
               {user.email}
             </AppText>
           )}
@@ -150,38 +117,19 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
         {drawerItems.map((item, index) => (
           <React.Fragment key={item.id}>
             {item.divider && index > 0 && (
-              <View
-                style={[
-                  styles.divider,
-                  {
-                    backgroundColor: colors.greyBackground || '#F5F5F5',
-                    marginVertical: spacing.md || 16,
-                  },
-                ]}
-              />
+              <View style={styles.divider} />
             )}
             <TouchableOpacity
               onPress={item.onPress}
-              style={[
-                styles.drawerItem,
-                {
-                  paddingVertical: spacing.md || 16,
-                  borderRadius: borderRadius.sm || 8,
-                },
-              ]}
+              style={styles.drawerItem}
               activeOpacity={0.7}
             >
               {item.iconName && (
-                <AppText style={{ fontSize: 20, marginRight: spacing.md || 16 }}>
+                <AppText style={styles.drawerItemIcon}>
                   {item.iconName}
                 </AppText>
               )}
-              <AppText
-                style={{
-                  fontSize: 16,
-                  color: colors.primaryText || '#000000',
-                }}
-              >
+              <AppText style={styles.drawerItemLabel}>
                 {item.label}
               </AppText>
             </TouchableOpacity>
@@ -191,31 +139,6 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
     </DrawerContentScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  userSection: {
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  itemsContainer: {
-    flex: 1,
-  },
-  drawerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  divider: {
-    height: 1,
-    marginHorizontal: 16,
-  },
-});
 
 export default CustomDrawerContent;
 
