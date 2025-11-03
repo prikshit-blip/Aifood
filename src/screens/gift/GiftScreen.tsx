@@ -13,66 +13,52 @@ import {
 import AppText from '../../components/ui/AppText';
 import createStyles from './styles';
 
-type ServiceScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Service'>;
+type GiftScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Gift'>;
 
-interface Service {
+interface GiftCard {
   id: string;
   title: string;
   description: string;
-  icon?: string;
-  available?: boolean;
+  value: number;
+  imageUrl?: string;
+  available: boolean;
 }
 
-const ServiceScreen: React.FC = () => {
-  const navigation = useNavigation<ServiceScreenNavigationProp>();
+const GiftScreen: React.FC = () => {
+  const navigation = useNavigation<GiftScreenNavigationProp>();
   const { colors, spacing, borderRadius } = useTheme();
-  const { user, logout } = useAuth();
 
   // No local state needed for drawer
 
-  // Mock service data
-  const services: Service[] = useMemo(
+  // Mock gift card data
+  const giftCards: GiftCard[] = useMemo(
     () => [
       {
         id: '1',
-        title: 'Table Reservation',
-        description: 'Reserve a table for your dining experience. Book in advance to avoid waiting.',
-        icon: '🍽️',
+        title: '$25 Gift Card',
+        description: 'Perfect gift for food lovers. Redeemable on all menu items.',
+        value: 25,
         available: true,
       },
       {
         id: '2',
-        title: 'Catering Services',
-        description: 'Order catering for your events. We provide customized menus for parties and gatherings.',
-        icon: '🎉',
+        title: '$50 Gift Card',
+        description: 'Great for special occasions. More value, more choices.',
+        value: 50,
         available: true,
       },
       {
         id: '3',
-        title: 'Private Dining',
-        description: 'Book our private dining room for special occasions and business meetings.',
-        icon: '🏛️',
+        title: '$100 Gift Card',
+        description: 'Premium gift card for the ultimate dining experience.',
+        value: 100,
         available: true,
       },
       {
         id: '4',
-        title: 'Chef Special',
-        description: 'Request a custom dish prepared by our chef. Available with 24 hours notice.',
-        icon: '👨‍🍳',
-        available: true,
-      },
-      {
-        id: '5',
-        title: 'Delivery Tracking',
-        description: 'Track your order in real-time from kitchen to your doorstep.',
-        icon: '📦',
-        available: true,
-      },
-      {
-        id: '6',
-        title: 'Customer Support',
-        description: 'Get help with your orders, reservations, or any inquiries.',
-        icon: '💬',
+        title: 'Custom Amount',
+        description: 'Choose your own gift card amount. Minimum $10.',
+        value: 0,
         available: true,
       },
     ],
@@ -91,11 +77,23 @@ const ServiceScreen: React.FC = () => {
     Alert.alert('Notifications', 'No new notifications');
   }, []);
 
-  const handleServicePress = useCallback((service: Service) => {
-    if (service.available) {
-      Alert.alert(service.title, service.description);
+  const handleGiftCardPress = useCallback((giftCard: GiftCard) => {
+    if (giftCard.available) {
+      Alert.alert(
+        giftCard.title,
+        giftCard.value > 0
+          ? `Purchase a $${giftCard.value} gift card?`
+          : 'Enter custom amount for gift card?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Purchase',
+            onPress: () => Alert.alert('Success', 'Gift card purchase initiated!'),
+          },
+        ]
+      );
     } else {
-      Alert.alert('Service Unavailable', 'This service is currently not available.');
+      Alert.alert('Unavailable', 'This gift card is currently not available.');
     }
   }, []);
 
@@ -135,33 +133,42 @@ const ServiceScreen: React.FC = () => {
             fontSize: 28,
             fontWeight: 'bold',
             color: colors.primaryText || '#000000',
+            marginBottom: spacing.sm || 8,
+          }}
+        >
+          Gift Cards
+        </AppText>
+        <AppText
+          style={{
+            fontSize: 14,
+            color: colors.greyText || '#666666',
             marginBottom: spacing.lg || 24,
           }}
         >
-          Our Services
+          Give the gift of great food. Choose a gift card for your loved ones.
         </AppText>
 
-        {services.map((service) => (
+        {giftCards.map((giftCard) => (
           <TouchableOpacity
-            key={service.id}
-            onPress={() => handleServicePress(service)}
-            disabled={!service.available}
+            key={giftCard.id}
+            onPress={() => handleGiftCardPress(giftCard)}
+            disabled={!giftCard.available}
             style={[
               {
                 backgroundColor: colors.whiteBackground || '#FFFFFF',
                 borderRadius: borderRadius.md || 12,
                 padding: spacing.md || 16,
                 marginBottom: spacing.md || 16,
-                borderWidth: 1,
-                borderColor: service.available
-                  ? colors.greyBackground || '#F5F5F5'
+                borderWidth: 2,
+                borderColor: giftCard.available
+                  ? colors.primary || '#FF6B35'
                   : colors.greyBackground || '#E0E0E0',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
                 shadowRadius: 4,
                 elevation: 3,
-                opacity: service.available ? 1 : 0.6,
+                opacity: giftCard.available ? 1 : 0.6,
               },
             ]}
             activeOpacity={0.7}
@@ -169,31 +176,31 @@ const ServiceScreen: React.FC = () => {
             <View
               style={{
                 flexDirection: 'row',
+                justifyContent: 'space-between',
                 alignItems: 'center',
-                marginBottom: spacing.sm || 8,
               }}
             >
-              {service.icon && (
-                <AppText
-                  style={{
-                    fontSize: 32,
-                    marginRight: spacing.md || 12,
-                  }}
-                >
-                  {service.icon}
-                </AppText>
-              )}
               <View style={{ flex: 1 }}>
                 <AppText
                   style={{
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: '600',
                     color: colors.primaryText || '#000000',
+                    marginBottom: spacing.xs || 4,
                   }}
                 >
-                  {service.title}
+                  {giftCard.title}
                 </AppText>
-                {!service.available && (
+                <AppText
+                  style={{
+                    fontSize: 14,
+                    color: colors.greyText || '#666666',
+                    marginBottom: spacing.sm || 8,
+                  }}
+                >
+                  {giftCard.description}
+                </AppText>
+                {!giftCard.available && (
                   <AppText
                     style={{
                       fontSize: 12,
@@ -205,21 +212,31 @@ const ServiceScreen: React.FC = () => {
                   </AppText>
                 )}
               </View>
+              {giftCard.value > 0 && (
+                <View
+                  style={{
+                    backgroundColor: colors.primary || '#FF6B35',
+                    paddingHorizontal: spacing.md || 16,
+                    paddingVertical: spacing.sm || 8,
+                    borderRadius: borderRadius.sm || 8,
+                  }}
+                >
+                  <AppText
+                    style={{
+                      fontSize: 18,
+                      fontWeight: '700',
+                      color: colors.whiteText || '#FFFFFF',
+                    }}
+                  >
+                    ${giftCard.value}
+                  </AppText>
+                </View>
+              )}
             </View>
-
-            <AppText
-              style={{
-                fontSize: 14,
-                color: colors.greyText || '#666666',
-                lineHeight: 20,
-              }}
-            >
-              {service.description}
-            </AppText>
           </TouchableOpacity>
         ))}
 
-        {services.length === 0 && (
+        {giftCards.length === 0 && (
           <View
             style={{
               flex: 1,
@@ -235,7 +252,7 @@ const ServiceScreen: React.FC = () => {
                 textAlign: 'center',
               }}
             >
-              No services available at the moment
+              No gift cards available at the moment
             </AppText>
           </View>
         )}
@@ -244,5 +261,5 @@ const ServiceScreen: React.FC = () => {
   );
 };
 
-export default ServiceScreen;
+export default GiftScreen;
 

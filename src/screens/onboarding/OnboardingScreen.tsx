@@ -44,7 +44,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ navigation }) => {
   const handleExplore = () => {
     // Mark onboarding as complete
     completeOnboarding();
-    navigation.replace('Home');  // Navigate to Home instead of SignIn
+    navigation.replace('MainTabs');  // Navigate to MainTabs instead of SignIn
   };
 
   return (

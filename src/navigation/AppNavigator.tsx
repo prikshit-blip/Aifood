@@ -9,8 +9,7 @@ import SplashScreen from '../screens/splash/SplashScreen';
 import SignInScreen from '../screens/signIn/SignInScreen';
 import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
 import SignUpScreen from '../screens/signUp/SignUpScreen';
-import HomeScreen from '../screens/home/HomeScreen';
-
+import DrawerNavigator from './DrawerNavigator';
 
 // Navigation types
 export type RootStackParamList = {
@@ -18,7 +17,7 @@ export type RootStackParamList = {
   Onboarding: undefined;
   SignIn: undefined;
   SignUp: undefined;
-  Home: undefined;
+  MainTabs: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -78,8 +77,8 @@ const AppNavigator: React.FC = () => {
             }}
           />
           <Stack.Screen 
-            name="Home" 
-            component={HomeScreen}
+            name="MainTabs" 
+            component={DrawerNavigator}
             options={{
               gestureEnabled: false,
             }}

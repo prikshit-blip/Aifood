@@ -4,7 +4,21 @@ export type RootStackParamList = {
   Onboarding: undefined;
   SignIn: undefined;
   SignUp: undefined;
+  MainTabs: undefined;
+};
+
+// Drawer Navigation types
+export type DrawerParamList = {
+  MainTabs: undefined;
+};
+
+// Bottom Tab Navigation types
+export type BottomTabParamList = {
   Home: undefined;
+  Promos: undefined;
+  Service: undefined;
+  Gift: undefined;
+  Cart: undefined;
 };
 
 // Navigation prop types
@@ -27,9 +41,35 @@ export type SignUpScreenProps = {
   route: RouteProp<'SignUp'>;
 };
 
-export type HomeScreenProps = {
+export type MainTabsProps = {
   navigation: NavigationProp;
-  route: RouteProp<'Home'>;
+  route: RouteProp<'MainTabs'>;
+};
+
+// Bottom Tab Navigation Props
+export type HomeScreenProps = {
+  navigation: import('@react-navigation/bottom-tabs').BottomTabNavigationProp<BottomTabParamList, 'Home'>;
+  route: import('@react-navigation/native').RouteProp<BottomTabParamList, 'Home'>;
+};
+
+export type PromosScreenProps = {
+  navigation: import('@react-navigation/bottom-tabs').BottomTabNavigationProp<BottomTabParamList, 'Promos'>;
+  route: import('@react-navigation/native').RouteProp<BottomTabParamList, 'Promos'>;
+};
+
+export type ServiceScreenProps = {
+  navigation: import('@react-navigation/bottom-tabs').BottomTabNavigationProp<BottomTabParamList, 'Service'>;
+  route: import('@react-navigation/native').RouteProp<BottomTabParamList, 'Service'>;
+};
+
+export type GiftScreenProps = {
+  navigation: import('@react-navigation/bottom-tabs').BottomTabNavigationProp<BottomTabParamList, 'Gift'>;
+  route: import('@react-navigation/native').RouteProp<BottomTabParamList, 'Gift'>;
+};
+
+export type CartScreenProps = {
+  navigation: import('@react-navigation/bottom-tabs').BottomTabNavigationProp<BottomTabParamList, 'Cart'>;
+  route: import('@react-navigation/native').RouteProp<BottomTabParamList, 'Cart'>;
 };
 
 // Note: SignUp route does not accept params

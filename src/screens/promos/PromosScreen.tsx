@@ -1,84 +1,93 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useMemo, useCallback } from 'react';
+import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from '../../hooks/useTheme';
-import { AppBar, BottomTabNavigator, Drawer } from '../../components/home';
-import { TabItem, DrawerItem } from '../../types/home';
-import AppText from '../../components/ui/AppText';
-import { Alert } from 'react-native';
-import { useAuth } from '../../hooks/useAuth';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../navigation/types';
+import { DrawerActions } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { BottomTabParamList } from '../../navigation/types';
+import { useTheme } from '../../hooks/useTheme';
+import { useAuth } from '../../hooks/useAuth';
+import {
+  AppBar,
+} from '../../components/home';
+import AppText from '../../components/ui/AppText';
 import createStyles from './styles';
 
-type PromosScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+type PromosScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Promos'>;
+
+interface Promo {
+  id: string;
+  title: string;
+  description: string;
+  discount?: string;
+  imageUrl?: string;
+  validUntil?: string;
+  code?: string;
+}
 
 const PromosScreen: React.FC = () => {
   const navigation = useNavigation<PromosScreenNavigationProp>();
   const { colors, spacing, borderRadius } = useTheme();
-  const { user, logout } = useAuth();
 
-  const [activeTab, setActiveTab] = React.useState<TabItem>('Promos');
-  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+  // No local state needed for drawer
 
-  const handleDrawerOpen = React.useCallback(() => {
-    setIsDrawerOpen(true);
-  }, []);
+  // Mock promo data
+  const promos: Promo[] = useMemo(
+    () => [
+      {
+        id: '1',
+        title: '50% Off on All Burgers',
+        description: 'Get 50% discount on all burger items. Valid until end of month.',
+        discount: '50% OFF',
+        validUntil: '2024-12-31',
+        code: 'BURGER50',
+      },
+      {
+        id: '2',
+        title: 'Free Delivery',
+        description: 'Free delivery on orders above $50. Use code at checkout.',
+        discount: 'FREE',
+        validUntil: '2024-12-31',
+        code: 'FREEDEL',
+      },
+      {
+        id: '3',
+        title: 'Buy 2 Get 1 Free',
+        description: 'Buy any 2 items and get 1 free. Limited time offer!',
+        discount: 'B2G1',
+        validUntil: '2024-12-31',
+        code: 'B2G1FREE',
+      },
+      {
+        id: '4',
+        title: 'Weekend Special',
+        description: '20% off on weekends. Every Saturday and Sunday.',
+        discount: '20% OFF',
+        validUntil: '2024-12-31',
+        code: 'WEEKEND20',
+      },
+    ],
+    []
+  );
 
-  const handleDrawerClose = React.useCallback(() => {
-    setIsDrawerOpen(false);
-  }, []);
+  // ========== Handlers ==========
+  const handleDrawerOpen = useCallback(() => {
+    const rootNavigation = navigation.getParent()?.getParent();
+    if (rootNavigation) {
+      rootNavigation.dispatch(DrawerActions.openDrawer());
+    }
+  }, [navigation]);
 
-  const handleNotificationPress = React.useCallback(() => {
+  const handleNotificationPress = useCallback(() => {
     Alert.alert('Notifications', 'No new notifications');
   }, []);
 
-  const handleTabPress = React.useCallback((tab: TabItem) => {
-    setActiveTab(tab);
-    // Navigate back to HomeScreen if not already there, or handle tab switching
+  const handlePromoPress = useCallback((promo: Promo) => {
+    Alert.alert('Promo Code', `Code: ${promo.code || 'N/A'}\n\n${promo.description}`);
   }, []);
 
-  const handleSignOut = React.useCallback(() => {
-    logout();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'SignIn' }],
-    });
-  }, [logout, navigation]);
-
-  const drawerItems: DrawerItem[] = React.useMemo(
-    () => [
-      {
-        id: 'profile',
-        label: 'My Profile',
-        iconName: '👤',
-        onPress: () => Alert.alert('Profile', 'Profile screen coming soon!'),
-      },
-      {
-        id: 'orders',
-        label: 'My Orders',
-        iconName: '📦',
-        onPress: () => Alert.alert('Orders', 'Orders screen coming soon!'),
-      },
-      {
-        id: 'settings',
-        label: 'Settings',
-        iconName: '⚙️',
-        onPress: () => Alert.alert('Settings', 'Settings screen coming soon!'),
-      },
-      { id: 'divider', label: '', onPress: () => {}, divider: true },
-      {
-        id: 'logout',
-        label: 'Sign Out',
-        iconName: '🚪',
-        onPress: handleSignOut,
-      },
-    ],
-    [handleSignOut]
-  );
-
-  const styles = React.useMemo(
+  // ========== Styles ==========
+  const styles = useMemo(
     () => createStyles(colors, spacing, borderRadius),
     [colors, spacing, borderRadius]
   );
@@ -87,164 +96,173 @@ const PromosScreen: React.FC = () => {
     return null;
   }
 
-  // Mock promo data
-  const promos = [
-    {
-      id: '1',
-      title: 'Summer Special',
-      description: 'Get 20% off on all items',
-      discount: '20% OFF',
-      validUntil: 'Valid until Dec 31, 2024',
-    },
-    {
-      id: '2',
-      title: 'Weekend Deal',
-      description: 'Buy 2 Get 1 Free',
-      discount: 'B2G1',
-      validUntil: 'Valid until Dec 31, 2024',
-    },
-    {
-      id: '3',
-      title: 'First Order Bonus',
-      description: 'Special discount for first-time customers',
-      discount: '15% OFF',
-      validUntil: 'Valid until Dec 31, 2024',
-    },
-  ];
-
   return (
     <SafeAreaView
       edges={['top']}
       style={[styles.container, { backgroundColor: colors.whiteBackground || '#FFFFFF' }]}
     >
+      {/* App Bar */}
       <AppBar
         onMenuPress={handleDrawerOpen}
         onNotificationPress={handleNotificationPress}
         hasNotifications={true}
       />
 
+      {/* Content */}
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingHorizontal: spacing.md || 16, paddingBottom: 100 },
-        ]}
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          padding: spacing.md || 16,
+          paddingBottom: 100, // Space for bottom tab
+        }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.header, { marginTop: spacing.md || 16, marginBottom: spacing.lg || 24 }]}>
-          <AppText
-            style={{
-              fontSize: 28,
-              fontWeight: 'bold',
-              color: colors.primaryText || '#000000',
-            }}
-          >
-            Promos & Offers
-          </AppText>
-          <AppText
-            style={{
-              fontSize: 14,
-              color: colors.greyText || '#666666',
-              marginTop: spacing.xs || 4,
-            }}
-          >
-            Discover amazing deals and discounts
-          </AppText>
-        </View>
+        <AppText
+          style={{
+            fontSize: 28,
+            fontWeight: 'bold',
+            color: colors.primaryText || '#000000',
+            marginBottom: spacing.lg || 24,
+          }}
+        >
+          Promotions & Offers
+        </AppText>
 
         {promos.map((promo) => (
           <TouchableOpacity
             key={promo.id}
+            onPress={() => handlePromoPress(promo)}
             style={[
-              styles.promoCard,
               {
                 backgroundColor: colors.whiteBackground || '#FFFFFF',
-                borderRadius: borderRadius.lg || 12,
-                padding: spacing.lg || 20,
+                borderRadius: borderRadius.md || 12,
+                padding: spacing.md || 16,
                 marginBottom: spacing.md || 16,
                 borderWidth: 1,
                 borderColor: colors.greyBackground || '#F5F5F5',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 3,
               },
             ]}
             activeOpacity={0.7}
-            onPress={() => Alert.alert('Promo', `Applying ${promo.title}`)}
           >
-            <View style={styles.promoHeader}>
-              <View style={styles.promoInfo}>
-                <AppText
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: spacing.sm || 8,
+              }}
+            >
+              <AppText
+                style={{
+                  fontSize: 18,
+                  fontWeight: '600',
+                  color: colors.primaryText || '#000000',
+                  flex: 1,
+                }}
+              >
+                {promo.title}
+              </AppText>
+              {promo.discount && (
+                <View
                   style={{
-                    fontSize: 20,
-                    fontWeight: '600',
-                    color: colors.primaryText || '#000000',
+                    backgroundColor: colors.primary || '#FF6B35',
+                    paddingHorizontal: spacing.sm || 12,
+                    paddingVertical: spacing.xs || 6,
+                    borderRadius: borderRadius.sm || 6,
                   }}
                 >
-                  {promo.title}
+                  <AppText
+                    style={{
+                      fontSize: 12,
+                      fontWeight: '700',
+                      color: colors.whiteText || '#FFFFFF',
+                    }}
+                  >
+                    {promo.discount}
+                  </AppText>
+                </View>
+              )}
+            </View>
+
+            <AppText
+              style={{
+                fontSize: 14,
+                color: colors.greyText || '#666666',
+                marginBottom: spacing.sm || 8,
+              }}
+            >
+              {promo.description}
+            </AppText>
+
+            {promo.code && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: spacing.xs || 4,
+                }}
+              >
+                <AppText
+                  style={{
+                    fontSize: 12,
+                    color: colors.greyText || '#666666',
+                    marginRight: spacing.xs || 4,
+                  }}
+                >
+                  Code:
                 </AppText>
                 <AppText
                   style={{
                     fontSize: 14,
-                    color: colors.greyText || '#666666',
-                    marginTop: spacing.xs || 4,
+                    fontWeight: '600',
+                    color: colors.primary || '#FF6B35',
                   }}
                 >
-                  {promo.description}
+                  {promo.code}
                 </AppText>
               </View>
-              <View
-                style={[
-                  styles.discountBadge,
-                  {
-                    backgroundColor: colors.primary || '#FF6B35',
-                    borderRadius: borderRadius.md || 8,
-                    paddingHorizontal: spacing.md || 12,
-                    paddingVertical: spacing.sm || 8,
-                  },
-                ]}
+            )}
+
+            {promo.validUntil && (
+              <AppText
+                style={{
+                  fontSize: 11,
+                  color: colors.greyText || '#999999',
+                  marginTop: spacing.xs || 4,
+                }}
               >
-                <AppText
-                  style={{
-                    fontSize: 16,
-                    fontWeight: '700',
-                    color: colors.whiteText || '#FFFFFF',
-                  }}
-                >
-                  {promo.discount}
-                </AppText>
-              </View>
-            </View>
-            <AppText
-              style={{
-                fontSize: 12,
-                color: colors.greyText || '#999999',
-                marginTop: spacing.md || 12,
-              }}
-            >
-              {promo.validUntil}
-            </AppText>
+                Valid until: {promo.validUntil}
+              </AppText>
+            )}
           </TouchableOpacity>
         ))}
+
+        {promos.length === 0 && (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingVertical: spacing.xl || 40,
+            }}
+          >
+            <AppText
+              style={{
+                fontSize: 16,
+                color: colors.greyText || '#666666',
+                textAlign: 'center',
+              }}
+            >
+              No promotions available at the moment
+            </AppText>
+          </View>
+        )}
       </ScrollView>
-
-      <BottomTabNavigator
-        activeTab={activeTab}
-        onTabPress={handleTabPress}
-        cartItemCount={0}
-      />
-
-      <Drawer
-        isOpen={isDrawerOpen}
-        onClose={handleDrawerClose}
-        items={drawerItems}
-        user={
-          user
-            ? {
-                name: user.firstName || user.email || 'User',
-                email: user.email || undefined,
-                avatarUrl: undefined,
-              }
-            : undefined
-        }
-      />
     </SafeAreaView>
   );
 };

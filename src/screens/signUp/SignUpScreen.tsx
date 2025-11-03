@@ -77,7 +77,7 @@ const SignUpScreen: React.FC = () => {
         phone: phone,
       };
 
-      navigation.navigate('Home');
+      navigation.navigate('MainTabs');
     } catch (error) {
       handleApiError(error);
     } finally {

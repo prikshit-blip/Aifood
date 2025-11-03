@@ -2,8 +2,9 @@ import React, { Suspense, useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../navigation/types';
+import { DrawerActions } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { BottomTabParamList } from '../../navigation/types';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
 import {
@@ -11,9 +12,7 @@ import {
   MenuHeader,
   CategoryHeader,
   ProductList,
-  BottomTabNavigator,
   FloatingSearchButton,
-  Drawer,
 } from '../../components/home';
 import ErrorBoundary from 'react-native-error-boundary';
 import AppText from '../../components/ui/AppText';
@@ -22,8 +21,6 @@ import {
   MenuItem as HomeMenuItem,
   CategoryItem,
   Product,
-  TabItem,
-  DrawerItem,
 } from '../../types/home';
 import createStyles from './styles';
 import { CategoryErrorFallback } from '../../components/ErrorBoundary';
@@ -31,7 +28,7 @@ import { useStoreMenu } from '../../api/menu/useMenu';
 import type { MenuItem as ApiMenuItem, MenuCategory } from '../../api/menu/menuApi';
 import ShimmerHeader from '../../components/ui/ShimmerHeader';
 
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+type HomeScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Home'>;
 
 const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -39,13 +36,11 @@ const HomeScreen: React.FC = () => {
   const { user, logout } = useAuth();
 
   // ========== State Management ==========
-  const [state, setState] = useState<HomeScreenState>({
+  const [state, setState] = useState<Omit<HomeScreenState, 'activeTab' | 'isDrawerOpen'>>({
     selectedMenuId: null,
     selectedCategoryId: null,
     products: [],
     isLoading: false,
-    isDrawerOpen: false,
-    activeTab: 'Home',
     favoriteProducts: [],
   });
 
@@ -217,12 +212,11 @@ const HomeScreen: React.FC = () => {
   }, []);
 
   const handleDrawerOpen = useCallback(() => {
-    setState((prev) => ({ ...prev, isDrawerOpen: true }));
-  }, []);
-
-  const handleDrawerClose = useCallback(() => {
-    setState((prev) => ({ ...prev, isDrawerOpen: false }));
-  }, []);
+    const rootNavigation = navigation.getParent()?.getParent();
+    if (rootNavigation) {
+      rootNavigation.dispatch(DrawerActions.openDrawer());
+    }
+  }, [navigation]);
 
   const handleNotificationPress = useCallback(() => {
     Alert.alert('Notifications', 'No new notifications');
@@ -259,51 +253,7 @@ const HomeScreen: React.FC = () => {
     // navigation.navigate('Search');
   }, []);
 
-  const handleTabPress = useCallback((tab: TabItem) => {
-    setState((prev) => ({ ...prev, activeTab: tab }));
-    Alert.alert('Tab', `Navigating to ${tab}`);
-    // navigation.navigate(tab);
-  }, []);
 
-  const handleSignOut = useCallback(() => {
-    logout();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'SignIn' }],
-    });
-  }, [logout, navigation]);
-
-  // ========== Drawer Items ==========
-  const drawerItems: DrawerItem[] = useMemo(
-    () => [
-      {
-        id: 'profile',
-        label: 'My Profile',
-        iconName: '👤',
-        onPress: () => Alert.alert('Profile', 'Profile screen coming soon!'),
-      },
-      {
-        id: 'orders',
-        label: 'My Orders',
-        iconName: '📦',
-        onPress: () => Alert.alert('Orders', 'Orders screen coming soon!'),
-      },
-      {
-        id: 'settings',
-        label: 'Settings',
-        iconName: '⚙️',
-        onPress: () => Alert.alert('Settings', 'Settings screen coming soon!'),
-      },
-      { id: 'divider', label: '', onPress: () => {}, divider: true },
-      {
-        id: 'logout',
-        label: 'Sign Out',
-        iconName: '🚪',
-        onPress: handleSignOut,
-      },
-    ],
-    [handleSignOut]
-  );
 
   // ========== Error Fallback Component ==========
   const ErrorFallback = ({ error, resetError }: { error: Error; resetError: () => void }) => {
@@ -478,29 +428,6 @@ const HomeScreen: React.FC = () => {
 
       {/* Floating Search Button */}
       <FloatingSearchButton onPress={handleSearchPress} />
-
-      {/* Bottom Tab Navigator */}
-      <BottomTabNavigator
-        activeTab={state.activeTab}
-        onTabPress={handleTabPress}
-        cartItemCount={0}
-      />
-
-      {/* Drawer */}
-      <Drawer
-        isOpen={state.isDrawerOpen}
-        onClose={handleDrawerClose}
-        items={drawerItems}
-        user={
-          user
-            ? {
-                name: user.firstName || user.email || 'User',
-                email: user.email || undefined,
-                avatarUrl: undefined,
-              }
-            : undefined
-        }
-      />
     </SafeAreaView>
   );
 };

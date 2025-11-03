@@ -65,7 +65,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ navigation }) => {
         // Check if user has completed onboarding
         if (hasCompletedOnboarding) {
           console.log('✅ Onboarding completed - navigating to Home');
-          navigation.replace('Home' as any);
+          navigation.replace('MainTabs' as any);
         } else {
           console.log('🆕 First time - navigating to Onboarding');
           navigation.replace('Onboarding' as any);

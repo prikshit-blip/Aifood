@@ -75,7 +75,7 @@ const SignInScreen: React.FC = () => {
         }
       );
 
-      navigation.navigate({ name: 'Home', params: undefined });
+      navigation.navigate({ name: 'MainTabs', params: undefined });
     } catch (error) {
       handleApiError(error);
     } finally {
