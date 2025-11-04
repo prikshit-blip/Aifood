@@ -2,15 +2,11 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { DrawerActions } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { BottomTabParamList } from '../../navigation/types';
 import { useTheme } from '../../hooks/useTheme';
-import { useAuth } from '../../hooks/useAuth';
-import {
-  AppBar,
-} from '../../components/home';
 import AppText from '../../components/ui/AppText';
+import ScreenHeader from '../../components/ui/ScreenHeader';
 import createStyles from './styles';
 
 type ServiceScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Service'>;
@@ -26,9 +22,6 @@ interface Service {
 const ServiceScreen: React.FC = () => {
   const navigation = useNavigation<ServiceScreenNavigationProp>();
   const { colors, spacing, borderRadius } = useTheme();
-  const { user, logout } = useAuth();
-
-  // No local state needed for drawer
 
   // Mock service data
   const services: Service[] = useMemo(
@@ -80,16 +73,6 @@ const ServiceScreen: React.FC = () => {
   );
 
   // ========== Handlers ==========
-  const handleDrawerOpen = useCallback(() => {
-    const rootNavigation = navigation.getParent()?.getParent();
-    if (rootNavigation) {
-      rootNavigation.dispatch(DrawerActions.openDrawer());
-    }
-  }, [navigation]);
-
-  const handleNotificationPress = useCallback(() => {
-    Alert.alert('Notifications', 'No new notifications');
-  }, []);
 
   const handleServicePress = useCallback((service: Service) => {
     if (service.available) {
@@ -114,12 +97,8 @@ const ServiceScreen: React.FC = () => {
       edges={['top']}
       style={styles.container}
     >
-      {/* App Bar */}
-      <AppBar
-        onMenuPress={handleDrawerOpen}
-        onNotificationPress={handleNotificationPress}
-        hasNotifications={true}
-      />
+      {/* Screen Header */}
+      <ScreenHeader title="Service" />
 
       {/* Content */}
       <ScrollView

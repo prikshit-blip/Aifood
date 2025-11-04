@@ -35,7 +35,7 @@ const CategoryHeader: React.FC<CategoryHeaderProps> = ({
           styles.categoryPill,
           {
             marginRight: spacing.sm || 8,
-            paddingHorizontal: spacing.md || 16,
+            paddingHorizontal: spacing.sm || 8,
             paddingVertical: spacing.xs || 8,
             backgroundColor: isSelected
               ? colors.primary || '#FF6B35'

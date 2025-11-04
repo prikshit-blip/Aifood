@@ -34,7 +34,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({
           style={[
             styles.item,
             {
-              marginRight: spacing.md || 16,
+              marginRight: spacing.sm || 8,
               paddingVertical: spacing.xs || 8,
               backgroundColor: isSelected
                 ? colors.highlight || '#FFF5F0'

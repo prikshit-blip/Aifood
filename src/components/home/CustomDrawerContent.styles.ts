@@ -7,63 +7,84 @@ const createStyles = (
   borderRadius: ThemeBorderRadius | undefined
 ) =>
   StyleSheet.create({
-    contentContainer: {
+    container: {
       flex: 1,
+      backgroundColor: colors?.whiteBackground || '#FFFFFF',
+    } as ViewStyle,
+    contentContainer: {
+      flexGrow: 1,
       paddingTop: spacing?.xl || 40,
-      paddingHorizontal: spacing?.lg || 20,
+      // paddingHorizontal: spacing?.md || 16,
     } as ViewStyle,
-    userSection: {
-      alignItems: 'center',
-      paddingBottom: spacing?.lg || 20,
-      marginBottom: spacing?.lg || 20,
-      borderBottomWidth: 1,
-      borderBottomColor: colors?.greyBackground || '#F5F5F5',
+    headerSection: {
+      
+      padding: spacing?.xs|| 4,
+      
     } as ViewStyle,
-    avatar: {
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      backgroundColor: colors?.secondaryBackground || '#FFF5F0',
-      justifyContent: 'center',
-      alignItems: 'center',
+    guestSection: {
+      marginBottom: spacing?.xs || 4,
     } as ViewStyle,
-    avatarIcon: {
-      fontSize: 24,
+    guestLabel: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors?.greyText || '#666666',
+      marginBottom: spacing?.xs || 4,
     } as TextStyle,
+    guestUnderline: {
+      height: 2,
+      backgroundColor: '#2196F3', // Light blue underline
+      width: '100%',
+    } as ViewStyle,
     userName: {
       fontSize: 18,
-      fontWeight: '600',
-      color: colors?.primaryText || '#000000',
-      marginTop: spacing?.sm || 8,
-    } as TextStyle,
-    userEmail: {
-      fontSize: 14,
-      color: colors?.greyText || '#666666',
-      marginTop: spacing?.xs || 4,
+      fontWeight: '700',
+      color: colors?.normalText || '#000000',
     } as TextStyle,
     itemsContainer: {
       flex: 1,
     } as ViewStyle,
     drawerItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 16,
       paddingVertical: spacing?.md || 16,
-      borderRadius: borderRadius?.sm || 8,
+      paddingHorizontal: spacing?.xs || 4,
     } as ViewStyle,
-    drawerItemIcon: {
-      fontSize: 20,
-      marginRight: spacing?.md || 16,
-    } as TextStyle,
     drawerItemLabel: {
       fontSize: 16,
-      color: colors?.primaryText || '#000000',
+      color: colors?.normalText || '#000000',
+      fontWeight: '400',
     } as TextStyle,
     divider: {
       height: 1,
-      marginHorizontal: 16,
       backgroundColor: colors?.greyBackground || '#F5F5F5',
-      marginVertical: spacing?.md || 16,
+      marginVertical: 0,
+    } as ViewStyle,
+    buttonContainer: {
+      paddingHorizontal: spacing?.md || 16,
+      paddingBottom: spacing?.lg || 24,
+      paddingTop: spacing?.md || 16,
+      // borderTopWidth: 1,
+      // borderTopColor: colors?.greyBackground || '#F5F5F5',
+    } as ViewStyle,
+    authButton: {
+      marginBottom: spacing?.sm || 8,
+      backgroundColor: colors?.normalText || '#000000',
+    } as ViewStyle,
+    authButtonText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors?.whiteText || '#FFFFFF',
+      textTransform: 'uppercase',
+    } as TextStyle,
+    logoutButton: {
+      borderWidth: 1,
+      borderColor: colors?.greyText || '#CCCCCC',
+    } as ViewStyle,
+    logoutButtonText: {
+      fontSize: 16,
+      fontWeight: '700',
+      textTransform: 'uppercase',
+    } as TextStyle,
+    authButtonContainer: {
+      gap: spacing?.sm || 8,
     } as ViewStyle,
   });
 

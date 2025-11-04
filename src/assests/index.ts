@@ -51,7 +51,7 @@ export const ICONS = {
   whatsAppLogo: require('./icons/whatsAppLogo.svg'),
   
   // Navigation & Actions
-  arrowLeft: require('./icons/ArrowLeft.svg'),
+  arrowLeft: require('./icons/arrowleft.png'),
   arrowSmall: require('./icons/Arrow Small.svg'),
   leftArrow: require('./icons/leftArrow.svg'),
   whiteLeftArrow: require('./icons/whiteLeftArrow.svg'),

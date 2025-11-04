@@ -95,6 +95,35 @@ const createStyles = (
       color: colors?.greyText || '#666666',
       textAlign: 'center',
     } as TextStyle,
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing?.md || 16,
+      paddingVertical: spacing?.sm || 12,
+      backgroundColor: colors?.whiteBackground || '#FFFFFF',
+    } as ViewStyle,
+    backButton: {
+      width: 40,
+      height: 40,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: spacing?.xs || 8,
+    } as ViewStyle,
+    backIcon: {
+      width: 24,
+      height: 24,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors?.primaryText || '#000000',
+      flex: 1,
+      textAlign: 'center',
+    } as TextStyle,
+    headerRight: {
+      width: 40,
+    } as ViewStyle,
   });
 
 export default createStyles;

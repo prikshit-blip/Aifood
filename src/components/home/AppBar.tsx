@@ -16,7 +16,7 @@ const AppBar: React.FC<AppBarProps> = ({
   }
 
   return (
-    <View style={[styles.container, { paddingHorizontal: spacing.md || 16, paddingTop: spacing.sm || 8 }]}>
+    <View style={[styles.container, { paddingHorizontal: spacing.sm || 8, paddingTop: spacing.sm || 8 }]}>
       {/* Hamburger Menu Button */}
       <TouchableOpacity
         onPress={onMenuPress}

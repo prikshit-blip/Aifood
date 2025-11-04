@@ -12,7 +12,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
 import { Alert } from 'react-native';
 import AppText from '../ui/AppText';
-import { DrawerItem } from '../../types/home';
+import AppButton from '../ui/AppButton';
 import createStyles from './CustomDrawerContent.styles';
 
 interface CustomDrawerContentProps extends DrawerContentComponentProps {
@@ -24,7 +24,7 @@ interface CustomDrawerContentProps extends DrawerContentComponentProps {
 }
 
 const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
-  user,
+  user={},
   navigation,
   ...props
 }) => {
@@ -40,103 +40,231 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
     return null;
   }
 
-  // Drawer Items
-  const drawerItems: DrawerItem[] = [
+  const isLoggedIn = !!user;
+
+  // Common menu items for both logged in and guest
+  const commonMenuItems = [
     {
-      id: 'profile',
-      label: 'My Profile',
-      iconName: '👤',
+      id: 'notifications',
+      label: 'Notifications',
       onPress: () => {
         navigation.dispatch(DrawerActions.closeDrawer());
-        Alert.alert('Profile', 'Profile screen coming soon!');
+        Alert.alert('Notifications', 'Notifications screen coming soon!');
       },
     },
     {
       id: 'orders',
       label: 'My Orders',
-      iconName: '📦',
       onPress: () => {
         navigation.dispatch(DrawerActions.closeDrawer());
-        Alert.alert('Orders', 'Orders screen coming soon!');
+        Alert.alert('My Orders', 'Orders screen coming soon!');
       },
     },
     {
-      id: 'settings',
-      label: 'Settings',
-      iconName: '⚙️',
+      id: 'booking',
+      label: 'My Booking',
       onPress: () => {
         navigation.dispatch(DrawerActions.closeDrawer());
-        Alert.alert('Settings', 'Settings screen coming soon!');
+        Alert.alert('My Booking', 'Booking screen coming soon!');
       },
     },
-    { id: 'divider', label: '', onPress: () => {}, divider: true },
     {
-      id: 'logout',
-      label: 'Sign Out',
-      iconName: '🚪',
+      id: 'giftCards',
+      label: 'Gift Cards',
       onPress: () => {
         navigation.dispatch(DrawerActions.closeDrawer());
-        logout();
-        const rootNavigation = navigation.getParent();
-        if (rootNavigation) {
-          rootNavigation.reset({
-            index: 0,
-            routes: [{ name: 'SignIn' as never }],
-          });
+        // Navigate to Gift tab - drawer is already inside MainTabs
+        try {
+          const tabsNavigation = navigation.getParent();
+          if (tabsNavigation) {
+            (tabsNavigation as any).navigate('Gift');
+          }
+        } catch (error) {
+          Alert.alert('Gift Cards', 'Gift Cards screen coming soon!');
         }
+      },
+    },
+    {
+      id: 'favourites',
+      label: 'Favourites',
+      onPress: () => {
+        navigation.dispatch(DrawerActions.closeDrawer());
+        Alert.alert('Favourites', 'Favourites screen coming soon!');
+      },
+    },
+    {
+      id: 'browseStores',
+      label: 'Browse Stores',
+      onPress: () => {
+        navigation.dispatch(DrawerActions.closeDrawer());
+        Alert.alert('Browse Stores', 'Browse Stores screen coming soon!');
+      },
+    },
+    {
+      id: 'changeLanguage',
+      label: 'Change Language',
+      onPress: () => {
+        navigation.dispatch(DrawerActions.closeDrawer());
+        Alert.alert('Change Language', 'Language settings coming soon!');
+      },
+    },
+    {
+      id: 'privacyPolicy',
+      label: 'Privacy Policy',
+      onPress: () => {
+        navigation.dispatch(DrawerActions.closeDrawer());
+        Alert.alert('Privacy Policy', 'Privacy Policy screen coming soon!');
+      },
+    },
+    {
+      id: 'termsConditions',
+      label: 'Terms and Conditions',
+      onPress: () => {
+        navigation.dispatch(DrawerActions.closeDrawer());
+        Alert.alert('Terms and Conditions', 'Terms screen coming soon!');
       },
     },
   ];
 
+  // Menu items for logged in users (includes additional items)
+  const loggedInMenuItems = [
+    {
+      id: 'profile',
+      label: 'My Profile',
+      onPress: () => {
+        navigation.dispatch(DrawerActions.closeDrawer());
+        Alert.alert('My Profile', 'Profile screen coming soon!');
+      },
+    },
+    {
+      id: 'ageVerification',
+      label: 'Age Verification',
+      onPress: () => {
+        navigation.dispatch(DrawerActions.closeDrawer());
+        Alert.alert('Age Verification', 'Age Verification screen coming soon!');
+      },
+    },
+    ...commonMenuItems,
+    {
+      id: 'deleteAccount',
+      label: 'Delete Account',
+      onPress: () => {
+        navigation.dispatch(DrawerActions.closeDrawer());
+        Alert.alert(
+          'Delete Account',
+          'Are you sure you want to delete your account?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Delete',
+              style: 'destructive',
+              onPress: () => Alert.alert('Account Deleted', 'Your account has been deleted.'),
+            },
+          ]
+        );
+      },
+    },
+  ];
+
+  const handleSignUp = () => {
+    navigation.dispatch(DrawerActions.closeDrawer());
+    const rootNavigation = navigation.getParent();
+    if (rootNavigation) {
+      rootNavigation.navigate('SignUp' as never);
+    }
+  };
+
+  const handleLogin = () => {
+    navigation.dispatch(DrawerActions.closeDrawer());
+    const rootNavigation = navigation.getParent();
+    if (rootNavigation) {
+      rootNavigation.navigate('SignIn' as never);
+    }
+  };
+
+  const handleLogout = () => {
+    navigation.dispatch(DrawerActions.closeDrawer());
+    logout();
+    const rootNavigation = navigation.getParent();
+    if (rootNavigation) {
+      rootNavigation.reset({
+        index: 0,
+        routes: [{ name: 'SignIn' as never }],
+      });
+    }
+  };
+
+  const menuItems = isLoggedIn ? loggedInMenuItems : commonMenuItems;
+
   return (
-    <DrawerContentScrollView
-      {...props}
-      contentContainerStyle={styles.contentContainer}
-    >
-      {/* User Info Section */}
-      {user && (
-        <View style={styles.userSection}>
-          <View style={styles.avatar}>
-            <AppText style={styles.avatarIcon}>👤</AppText>
-          </View>
-          {user.name && (
+    <View style={styles.container}>
+      <DrawerContentScrollView
+        {...props}
+        contentContainerStyle={{ paddingHorizontal: 0 }}
+      >
+        {/* User/Guest Info Section */}
+        <View style={styles.headerSection}>
+          {isLoggedIn ? (
             <AppText style={styles.userName}>
-              {user.name}
+              {user.name || 'User'}
             </AppText>
-          )}
-          {user.email && (
-            <AppText style={styles.userEmail}>
-              {user.email}
-            </AppText>
+          ) : (
+            <View style={styles.guestSection}>
+              <AppText color={colors?.normalText} style={styles.guestLabel}>Guest</AppText>
+              {/* <View style={styles.guestUnderline} /> */}
+            </View>
           )}
         </View>
-      )}
 
-      {/* Drawer Items */}
-      <View style={styles.itemsContainer}>
-        {drawerItems.map((item, index) => (
-          <React.Fragment key={item.id}>
-            {item.divider && index > 0 && (
-              <View style={styles.divider} />
-            )}
-            <TouchableOpacity
-              onPress={item.onPress}
-              style={styles.drawerItem}
-              activeOpacity={0.7}
-            >
-              {item.iconName && (
-                <AppText style={styles.drawerItemIcon}>
-                  {item.iconName}
+        {/* Drawer Items */}
+        <View style={styles.itemsContainer}>
+          {menuItems.map((item) => (
+            <React.Fragment key={item.id}>
+              <TouchableOpacity
+                onPress={item.onPress}
+                style={styles.drawerItem}
+                activeOpacity={0.7}
+              >
+                <AppText style={styles.drawerItemLabel}>
+                  {item.label}
                 </AppText>
-              )}
-              <AppText style={styles.drawerItemLabel}>
-                {item.label}
-              </AppText>
-            </TouchableOpacity>
-          </React.Fragment>
-        ))}
+              </TouchableOpacity>
+              <View style={styles.divider} />
+            </React.Fragment>
+          ))}
+        </View>
+      </DrawerContentScrollView>
+
+      {/* Action Buttons */}
+      <View style={styles.buttonContainer}>
+        {isLoggedIn ? (
+          <AppButton
+            title="LOG OUT"
+            onPress={handleLogout}
+            variant="secondary"
+            // style={styles.logoutButton}
+            textStyle={styles.logoutButtonText}
+          />
+        ) : (
+          <View style={styles.authButtonContainer}>
+            <AppButton
+              title="SIGN UP"
+              onPress={handleSignUp}
+              variant="secondary"
+              // style={styles.authButton}
+              // textStyle={styles.authButtonText}
+            />
+            <AppButton
+              title="LOGIN"
+              onPress={handleLogin}
+              variant="secondary"
+              // style={styles.authButton}
+              // textStyle={styles.authButtonText}
+            />
+          </View>
+        )}
       </View>
-    </DrawerContentScrollView>
+    </View>
   );
 };
 

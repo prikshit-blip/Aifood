@@ -5,14 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { BottomTabParamList } from '../../navigation/types';
 import { useTheme } from '../../hooks/useTheme';
-import { useAuth } from '../../hooks/useAuth';
-import { useDrawerNavigation } from '../../hooks/useDrawerNavigation';
 import ErrorBoundary from 'react-native-error-boundary';
-import {
-  AppBar,
-} from '../../components/home';
 import AppText from '../../components/ui/AppText';
 import Shimmer from '../../components/ui/Shimmer';
+import ScreenHeader from '../../components/ui/ScreenHeader';
 import { ErrorFallback } from '../../components/ErrorBoundary';
 import { AsyncPromoList, type Promo } from './AsyncPromoList';
 import createStyles from './styles';
@@ -22,19 +18,11 @@ type PromosScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'P
 const PromosScreen: React.FC = () => {
   const navigation = useNavigation<PromosScreenNavigationProp>();
   const { colors, spacing, borderRadius } = useTheme();
-  const { openDrawer } = useDrawerNavigation();
   
   // State to control demo mode (toggle between async and sync)
   const [useAsyncDemo, setUseAsyncDemo] = useState(true);
 
   // ========== Handlers ==========
-  const handleDrawerOpen = useCallback(() => {
-    openDrawer();
-  }, [openDrawer]);
-
-  const handleNotificationPress = useCallback(() => {
-    Alert.alert('Notifications', 'No new notifications');
-  }, []);
 
   const handlePromoPress = useCallback((promo: Promo) => {
     Alert.alert('Promo Code', `Code: ${promo.code || 'N/A'}\n\n${promo.description}`);
@@ -55,12 +43,8 @@ const PromosScreen: React.FC = () => {
       edges={['top']}
       style={styles.container}
     >
-      {/* App Bar */}
-      <AppBar
-        onMenuPress={handleDrawerOpen}
-        onNotificationPress={handleNotificationPress}
-        hasNotifications={true}
-      />
+      {/* Screen Header */}
+      <ScreenHeader title="Promos and Offers" />
 
       {/* Content */}
       {/* 

@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Image } from 'react-native';
 import AppText from '../../components/ui/AppText';
 import createStyles from './styles';
+import { IMAGES } from '../../assests';
 
 /**
  * Promo interface
@@ -14,6 +15,10 @@ export interface Promo {
   imageUrl?: string;
   validUntil?: string;
   code?: string;
+  backgroundColor?: string;
+  buttonText?: string;
+  buttonType?: 'promocode' | 'order';
+  amount?: string;
 }
 
 /**
@@ -27,35 +32,35 @@ const fetchPromos = async (): Promise<Promo[]> => {
   return [
     {
       id: '1',
-      title: '50% Off on All Burgers',
-      description: 'Get 50% discount on all burger items. Valid until end of month.',
+      title: 'Flat 50% off on all Burgers',
+      description: '',
       discount: '50% OFF',
-      validUntil: '2024-12-31',
-      code: 'BURGER50',
+      backgroundColor: '#4CAF50', // Green
+      code: 'FOOD 30',
+      buttonText: 'Promocode FOOD 30',
+      buttonType: 'promocode',
+      imageUrl: 'burger',
     },
     {
       id: '2',
-      title: 'Free Delivery',
-      description: 'Free delivery on orders above $50. Use code at checkout.',
-      discount: 'FREE',
-      validUntil: '2024-12-31',
-      code: 'FREEDEL',
+      title: 'Flat 50% off on all Burgers',
+      description: '',
+      discount: '50% OFF',
+      backgroundColor: '#FF9800', // Orange
+      code: 'FOOD 30',
+      buttonText: 'Promocode FOOD 30',
+      buttonType: 'promocode',
+      imageUrl: 'burger',
     },
     {
       id: '3',
-      title: 'Buy 2 Get 1 Free',
-      description: 'Buy any 2 items and get 1 free. Limited time offer!',
-      discount: 'B2G1',
-      validUntil: '2024-12-31',
-      code: 'B2G1FREE',
-    },
-    {
-      id: '4',
-      title: 'Weekend Special',
-      description: '20% off on weekends. Every Saturday and Sunday.',
-      discount: '20% OFF',
-      validUntil: '2024-12-31',
-      code: 'WEEKEND20',
+      title: 'Meal at $199',
+      description: 'Burger, Fries, Cold Drink',
+      backgroundColor: '#2196F3', // Blue
+      amount: '$199',
+      buttonText: 'ORDER NOW',
+      buttonType: 'order',
+      imageUrl: 'meal',
     },
   ];
 };
@@ -151,54 +156,101 @@ export const AsyncPromoList: React.FC<AsyncPromoListProps> = ({
   // This will throw the promise if pending, which Suspense catches
   const promos = useSuspensePromise(promosPromise);
 
+  const handleTermsPress = (promo: Promo) => {
+    // Handle terms and conditions press
+    onPromoPress(promo);
+  };
+
+  const handleButtonPress = (promo: Promo) => {
+    // Handle button press (promocode or order)
+    onPromoPress(promo);
+  };
+
   return (
     <>
-      <AppText style={styles.title}>
-        Promotions & Offers
-      </AppText>
+      {promos.map((promo) => {
+        const cardStyle = [
+          styles.promoCard,
+          { backgroundColor: promo.backgroundColor || colors?.whiteBackground || '#FFFFFF' }
+        ];
 
-      {promos.map((promo) => (
-        <TouchableOpacity
-          key={promo.id}
-          onPress={() => onPromoPress(promo)}
-          style={styles.promoCard}
-          activeOpacity={0.7}
-        >
-          <View style={styles.promoCardHeader}>
-            <AppText style={styles.promoCardTitle}>
-              {promo.title}
-            </AppText>
-            {promo.discount && (
-              <View style={styles.discountBadge}>
-                <AppText style={styles.discountBadgeText}>
-                  {promo.discount}
-                </AppText>
+        // Get image source
+        const imageSource = promo.imageUrl === 'burger' 
+          ? IMAGES.burgerImg 
+          : promo.imageUrl === 'meal' 
+            ? IMAGES.burgerImg // Using burger as placeholder for meal
+            : null;
+
+        return (
+          <View key={promo.id} style={cardStyle}>
+            {/* Image Section */}
+            {imageSource && (
+              <View style={styles.promoImageContainer}>
+                <Image
+                  source={imageSource}
+                  style={styles.promoImage}
+                  resizeMode="cover"
+                />
               </View>
             )}
-          </View>
 
-          <AppText style={styles.promoDescription}>
-            {promo.description}
-          </AppText>
+            {/* Content Section */}
+            <View style={styles.promoContent}>
+              {/* Discount Badge */}
+              {promo.discount && (
+                <View style={styles.discountBadge}>
+                  <AppText style={styles.discountBadgeText}>
+                    {promo.discount}
+                  </AppText>
+                </View>
+              )}
 
-          {promo.code && (
-            <View style={styles.codeContainer}>
-              <AppText style={styles.codeLabel}>
-                Code:
+              {/* Title */}
+              <AppText style={styles.promoCardTitle}>
+                {promo.title}
               </AppText>
-              <AppText style={styles.codeValue}>
-                {promo.code}
-              </AppText>
+
+              {/* Description or Amount */}
+              {promo.description ? (
+                <AppText style={styles.promoDescription}>
+                  {promo.description}
+                </AppText>
+              ) : promo.amount ? (
+                <AppText style={styles.promoAmount}>
+                  {promo.amount}
+                </AppText>
+              ) : null}
+
+              {/* View T&C Link */}
+              <TouchableOpacity
+                onPress={() => handleTermsPress(promo)}
+                style={styles.termsLink}
+                activeOpacity={0.7}
+              >
+                <AppText style={styles.termsLinkText}>
+                  View T&C
+                </AppText>
+              </TouchableOpacity>
+
+              {/* Action Button */}
+              {promo.buttonText && (
+                <TouchableOpacity
+                  onPress={() => handleButtonPress(promo)}
+                  style={[
+                    styles.promoButton,
+                    promo.buttonType === 'order' && styles.promoButtonOrder
+                  ]}
+                  activeOpacity={0.8}
+                >
+                  <AppText style={styles.promoButtonText}>
+                    {promo.buttonText}
+                  </AppText>
+                </TouchableOpacity>
+              )}
             </View>
-          )}
-
-          {promo.validUntil && (
-            <AppText style={styles.validUntil}>
-              Valid until: {promo.validUntil}
-            </AppText>
-          )}
-        </TouchableOpacity>
-      ))}
+          </View>
+        );
+      })}
 
       {promos.length === 0 && (
         <View style={styles.emptyStateContainer}>
