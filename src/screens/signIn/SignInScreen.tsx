@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Alert,
@@ -20,7 +19,10 @@ import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { validateEmail, validatePassword } from '../../utils/validators';
 import { handleApiError } from '../../utils/errorHandler';
+import AppTextInput from '../../components/ui/AppTextInput';
 import { createStyles } from './styles';
+import FastImage from 'react-native-fast-image';
+import { ICONS } from '../../assests';
 
 type SignInScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignIn'>;
 
@@ -84,7 +86,7 @@ const SignInScreen: React.FC = () => {
   };
 
   const handleSkip = () => {
-    navigation.navigate({ name: 'Home', params: undefined });
+    navigation.navigate({ name: 'MainTabs', params: undefined });
   };
 
   const handleSignUp = () => {
@@ -122,38 +124,35 @@ const SignInScreen: React.FC = () => {
 
               {/* Email Input */}
               <View style={styles.inputContainer}>
-                <View style={styles.inputWrapper}>
-                  <Text style={styles.inputIcon}>✉️</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    placeholderTextColor="#999"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
+                <AppTextInput
+                  placeholder="Email"
+                  placeholderTextColor="#999"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  leftIcon={<Image source={ICONS.mailBig} style={styles.inputIconImage} />}
+                //   containerStyle={styles.inputWrapper}
+                //   inputStyle={styles.input}
+                />
               </View>
 
               {/* Password Input */}
               <View style={styles.inputContainer}>
-                <View style={styles.inputWrapper}>
-                  <Text style={styles.inputIcon}>🔒</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor="#999"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={!showPassword}
-                    autoCapitalize="none"
-                  />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                    <Text style={styles.eyeIconText}>{showPassword ? '👁️' : '👁️'}</Text>
-                  </TouchableOpacity>
-                </View>
+                <AppTextInput
+                  placeholder="Password"
+                  placeholderTextColor="#999"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  leftIcon={<FastImage source={ICONS.passwordBig} style={styles.inputIconImage} />}
+                  rightIcon={<Image source={ICONS.eyeBig} style={styles.inputIconImage} />}
+                  onPressRightIcon={() => setShowPassword(!showPassword)}
+                  // containerStyle={styles.inputWrapper}
+                  // inputStyle={styles.input}
+                />
               </View>
 
               {/* Sign Up Button */}

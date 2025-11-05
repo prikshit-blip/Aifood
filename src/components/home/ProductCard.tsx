@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Image, ImageSourcePropType } from 'react-native
 import { useTheme } from '../../hooks/useTheme';
 import { ProductCardProps } from '../../types/home';
 import AppText from '../ui/AppText';
-import { getImage, ICONS } from '../../assests';
+import { getImage, ICONS, IMAGES } from '../../assests';
 import AppImage from '../ui/AppImage';
 import FastImage, { ImageStyle, Source } from 'react-native-fast-image';
 import AppHeading from '../ui/AppHeading';
@@ -71,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Product Image */}
         {productImage && (
           <FastImage
-            source={productImage as Source}
+            source={productImage||IMAGES.burgerImg as Source}
             style={styles.image as ImageStyle}
             resizeMode="cover"
           />

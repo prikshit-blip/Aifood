@@ -102,6 +102,14 @@ export const createStyles = (
       fontSize: 20,
       marginRight: spacing?.md || 12,
     },
+    inputIconImage: {
+      
+      tintColor:colors?.greyText || '#000000',
+      width: 20,
+      height: 20,
+      marginRight: 6,
+      resizeMode: 'contain',
+    },
     input: {
       flex: 1,
       paddingVertical: spacing?.md || 16,

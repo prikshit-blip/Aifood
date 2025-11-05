@@ -57,19 +57,19 @@ export const ICONS = {
   whiteLeftArrow: require('./icons/whiteLeftArrow.svg'),
   
   // User & Profile
-  user: require('./icons/user.svg'),
+  user: require('./icons/user.png'),
   userBig: require('./icons/user Big.svg'),
   userCheckout: require('./icons/userCheckout.svg'),
   
   // Auth & Security
-  eyeBig: require('./icons/Eye Big.svg'),
-  passwordBig: require('./icons/Password Big.svg'),
+  eyeBig: require('./icons/eye.png'),
+  passwordBig: require('./icons/password.png'),
   logout: require('./icons/logout.png'),
   
   // Contact & Communication
-  mailBig: require('./icons/mail big.svg'),
+  mailBig: require('./icons/email.png'),
   mailCheckout: require('./icons/mailCheckout.svg'),
-  phoneBig: require('./icons/phone Big.svg'),
+  phoneBig: require('./icons/phone.png'),
   phoneBig1: require('./icons/phone Big (1).svg'),
   phoneCheckout: require('./icons/phoneCheckout.svg'),
   

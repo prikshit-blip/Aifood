@@ -26,6 +26,7 @@ import AppTextInput from '../../components/ui/AppTextInput';
 import AppImage from '../../components/ui/AppImage';
 import { ICONS } from '../../assests';
 import createStyles from './styles';
+import FastImage from 'react-native-fast-image';
 
 type SignInScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignIn'>;
 
@@ -125,7 +126,7 @@ const SignUpScreen: React.FC = () => {
             <View style={styles.inputContainer}>
               <AppTextInput
                 placeholder="Name"
-                leftIcon={<Image source={ICONS.user} style={styles.inputIconImage}  />}
+                leftIcon={<FastImage source={ICONS.user} style={styles.inputIconImage}  />}
                 value={name}
                 onChangeText={setName}
                 autoCapitalize="words"
@@ -172,13 +173,15 @@ const SignUpScreen: React.FC = () => {
             </View>
 
             {/* Sign Up Button */}
-            <AppButton
+           
+           <AppButton
               title={isLoading ? 'SIGNING UP...' : 'SIGN UP'}
-              variant="primary"
+              // variant="primary"
               onPress={handleSignUp}
               loading={isLoading}
               style={{ width: '100%' }}
             />
+          
 
             {/* OR Divider */}
             <View style={styles.dividerContainer}>

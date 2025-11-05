@@ -104,10 +104,10 @@ export const createStyles = (
     },
     inputIconImage: {
       
-      tintColor:colors?.primaryText || '#000000',
-      width: 22,
-      height: 22,
-      marginRight: 12,
+      tintColor:colors?.greyText || '#000000',
+      width: 20,
+      height: 20,
+      marginRight: 6,
       resizeMode: 'contain',
     },
     input: {

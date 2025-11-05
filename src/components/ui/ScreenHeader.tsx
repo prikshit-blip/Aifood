@@ -36,15 +36,16 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
 
   return (
     <View
-      style={[
+     
+    >
+      <View  style={[
         styles.header,
         {
           paddingHorizontal: spacing.sm || 8,
           paddingVertical: spacing.sm || 12,
           backgroundColor: colors.whiteBackground || '#FFFFFF',
         },
-      ]}
-    >
+      ]}>
       {showBackButton ? (
         <TouchableOpacity
           onPress={handleBackPress}
@@ -84,6 +85,8 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
       ) : (
         <View style={styles.rightContainer} />
       )}
+      </View>
+      <View style={styles.bottom}/>
     </View>
   );
 };
@@ -102,7 +105,7 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.1,
     // shadowRadius: 3,
     // Android shadow
-    elevation: 1,
+    // elevation: 1,
   } as ViewStyle,
   backButton: {
     width: 40,
@@ -123,6 +126,19 @@ const styles = StyleSheet.create({
   rightContainer: {
     width: 40,
     alignItems: 'flex-end',
+  } as ViewStyle,
+  bottom:{
+    height: 1,
+    // backgroundColor: 'grey',
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    // Android shadow
+    elevation: 1,
   } as ViewStyle,
 });
 

@@ -69,7 +69,7 @@ function getVariantStyles(
     secondary_button?: { background?: string; text_color?: string };
   }
 ) {
-  const primaryBg = buttons.primary_button?.background || '#000000';
+  const primaryBg = buttons.primary_button?.primaryColor || '#000000';
   const primaryText = buttons.primary_button?.text_color || '#FFFFFF';
   const secondaryBg = buttons.secondary_button?.background || '#F5F5F5';
   const secondaryText = buttons.secondary_button?.text_color || '#000000';
