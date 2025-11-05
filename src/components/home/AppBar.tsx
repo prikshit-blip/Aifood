@@ -3,6 +3,8 @@ import { View, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 import { AppBarProps } from '../../types/home';
 import AppText from '../ui/AppText';
+import FastImage from 'react-native-fast-image';
+import { ICONS } from '../../assests';
 
 const AppBar: React.FC<AppBarProps> = ({
   onMenuPress,
@@ -43,7 +45,13 @@ const AppBar: React.FC<AppBarProps> = ({
         <View style={styles.notificationContainer}>
           {/* Bell Icon (simplified) */}
           <View style={[styles.bellIcon, { borderColor: colors.primaryText || '#000000' }]}>
-            <AppText style={{ fontSize: 16, color: colors.primaryText || '#000000' }}>🔔</AppText>
+            
+              <FastImage
+                source={ICONS.Service}
+                tintColor={"#666666"}
+                style={{width:24,height:24}}
+               />
+            
           </View>
           {/* Notification Badge */}
           {hasNotifications && (

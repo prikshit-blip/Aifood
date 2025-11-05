@@ -14,11 +14,14 @@ const createStyles = (
     contentContainer: {
       flexGrow: 1,
       paddingTop: spacing?.xl || 40,
+     
+      // alignItems:"flex-start",
+
       // paddingHorizontal: spacing?.md || 16,
     } as ViewStyle,
     headerSection: {
       
-      padding: spacing?.xs|| 4,
+      paddingTop: spacing?.md|| 16,
       
     } as ViewStyle,
     guestSection: {
@@ -42,6 +45,7 @@ const createStyles = (
     } as TextStyle,
     itemsContainer: {
       flex: 1,
+      
     } as ViewStyle,
     drawerItem: {
       paddingVertical: spacing?.md || 16,
@@ -56,6 +60,7 @@ const createStyles = (
       height: 1,
       backgroundColor: colors?.greyBackground || '#F5F5F5',
       marginVertical: 0,
+      opacity: 0.3,
     } as ViewStyle,
     buttonContainer: {
       paddingHorizontal: spacing?.md || 16,

@@ -1,5 +1,5 @@
 import React, { Suspense, useState, useMemo, useCallback } from 'react';
-import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -7,6 +7,7 @@ import { BottomTabParamList } from '../../navigation/types';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
 import { useDrawerNavigation } from '../../hooks/useDrawerNavigation';
+import NotificationModal from '../notifications/NotificationModal';
 import {
   AppBar,
   MenuHeader,
@@ -27,6 +28,8 @@ import { CategoryErrorFallback } from '../../components/ErrorBoundary';
 import { useStoreMenu } from '../../api/menu/useMenu';
 import type { MenuItem as ApiMenuItem, MenuCategory } from '../../api/menu/menuApi';
 import ShimmerHeader from '../../components/ui/ShimmerHeader';
+import { useStoreProducts } from '../../api/products/useProducts';
+import type { Product as ApiProduct, ProductApiResponse } from '../../api/products/productApi';
 
 type HomeScreenNavigationProp = BottomTabNavigationProp<BottomTabParamList, 'Home'>;
 
@@ -45,9 +48,11 @@ const HomeScreen: React.FC = () => {
     favoriteProducts: [],
   });
 
+  const [isNotificationModalVisible, setIsNotificationModalVisible] = useState(false);
+
   // ========== Fetch Menu Data from API ==========
   const { data: menuData, isLoading: isLoadingMenu, error: menuError } = useStoreMenu();
-
+  const { data: productsData, isLoading: isLoadingProducts, error: productsError } = useStoreProducts();
   // ========== Transform API Data to Component Types ==========
   const menuItems: HomeMenuItem[] = useMemo(() => {
     if (!menuData?.menus) return [];
@@ -83,95 +88,91 @@ const HomeScreen: React.FC = () => {
     }));
   }, [menuData, state.selectedMenuId]);
 
-  const mockProducts: Product[] = useMemo(
-    () => [
-      {
-        id: '1',
-        title: 'Veg Farm Fresh Burger',
-        subHeading: 'Sub Heading',
-        description: 'Cherry tomatoes, artich and...',
-        price: 28.0,
-        isPopular: true,
-        isFavorite: false,
+  // ========== Transform API Products to Component Products ==========
+  const transformedProducts: Product[] = useMemo(() => {
+    // Handle response structure - could be direct or wrapped in data
+    const categories = productsData?.categories || (productsData as any)?.data?.categories;
+    if (!categories) return [];
+
+    const allProducts: Product[] = [];
+
+    // Iterate through all categories and their products
+    Object.entries(categories).forEach(([categoryId, apiProducts]) => {
+      const products = apiProducts as ApiProduct[];
+      products.forEach((apiProduct: ApiProduct) => {
+        // Extract tag IDs from tags array
+        const tagIds = apiProduct.tags?.map((tag) => tag.tag_id) || [];
+
+        allProducts.push({
+          id: apiProduct.product_id.toString(),
+          title: apiProduct.product_name || 'Untitled Product',
+          subHeading: apiProduct.product_subtitle || undefined,
+          description: apiProduct.product_subtitle || '',
+          price: apiProduct.price || 0,
+          imageUrl: apiProduct.image_url || undefined,
+          imageUri: apiProduct.image_url || undefined,
+          dietaryInfo: {
+            // You can map tags to dietary info if needed
+            isVegetarian: tagIds.includes(5) || false, // Example: tag_id 5 might be vegetarian
+            isVegan: tagIds.includes(6) || false, // Example: tag_id 6 might be vegan
+            isGlutenFree: false,
+            allergens: [],
+          },
+          isPopular: false, // Can be determined from tags or other fields
+          isFavorite: state.favoriteProducts.includes(apiProduct.product_id.toString()),
+          tags: tagIds.map((id) => id.toString()),
+          inStock: apiProduct.stock_status !== false, // null or true means in stock
+          availableQuantity: undefined,
+          // Store category_id for filtering (will be used internally)
+          categoryId: parseInt(categoryId, 10),
+          menuId: undefined,
+        } as Product & { categoryId: number; menuId?: number });
+      });
+    });
+
+    return allProducts;
+  }, [productsData, state.favoriteProducts]);
+
+  // ========== Filter Products by Category ==========
+  const filteredProducts: Product[] = useMemo(() => {
+    // Handle response structure - could be direct or wrapped in data
+    const categories = productsData?.categories || (productsData as any)?.data?.categories;
+    
+    if (!state.selectedCategoryId || !categories) {
+      return transformedProducts;
+    }
+
+    const selectedCategoryIdStr = state.selectedCategoryId;
+    const categoryProducts = categories[selectedCategoryIdStr] || [];
+
+    // Transform products for the selected category
+    return categoryProducts.map((apiProduct: ApiProduct) => {
+      const tagIds = apiProduct.tags?.map((tag) => tag.tag_id) || [];
+
+      return {
+        id: apiProduct.product_id.toString(),
+        title: apiProduct.product_name || 'Untitled Product',
+        subHeading: apiProduct.product_subtitle || undefined,
+        description: apiProduct.product_subtitle || '',
+        price: apiProduct.price || 0,
+        imageUrl: apiProduct.image_url || undefined,
+        imageUri: apiProduct.image_url || undefined,
         dietaryInfo: {
-          isVegetarian: true,
-          isVegan: false,
+          isVegetarian: tagIds.includes(5) || false,
+          isVegan: tagIds.includes(6) || false,
+          isGlutenFree: false,
+          allergens: [],
         },
-        inStock: true,
-      },
-      {
-        id: '2',
-        title: 'Veg Farm Fresh Burger',
-        subHeading: 'Sub Heading',
-        description: 'Cherry tomatoes, artich and...',
-        price: 28.0,
-        isPopular: true,
-        isFavorite: false,
-        dietaryInfo: {
-          isVegetarian: true,
-          isVegan: false,
-        },
-        inStock: true,
-      },
-      {
-        id: '3',
-        title: 'Veg Farm Fresh Burger',
-        subHeading: 'Sub Heading',
-        description: 'Cherry tomatoes, artich and...',
-        price: 28.0,
-        isPopular: true,
-        isFavorite: false,
-        dietaryInfo: {
-          isVegetarian: true,
-          isVegan: false,
-        },
-        inStock: true,
-      },
-      {
-        id: '4',
-        title: 'Veg Farm Fresh Burger',
-        subHeading: 'Sub Heading',
-        description: 'Cherry tomatoes, artich and...',
-        price: 28.0,
-        isPopular: true,
-        isFavorite: false,
-        dietaryInfo: {
-          isVegetarian: true,
-          isVegan: false,
-        },
-        inStock: true,
-      },
-      {
-        id: '5',
-        title: 'Veg Farm Fresh Burger',
-        subHeading: 'Sub Heading',
-        description: 'Cherry tomatoes, artich and...',
-        price: 28.0,
-        isPopular: true,
-        isFavorite: false,
-        dietaryInfo: {
-          isVegetarian: true,
-          isVegan: false,
-        },
-        inStock: true,
-      },
-      {
-        id: '6',
-        title: 'Veg Farm Fresh Burger',
-        subHeading: 'Sub Heading',
-        description: 'Cherry tomatoes, artich and...',
-        price: 28.0,
-        isPopular: true,
-        isFavorite: false,
-        dietaryInfo: {
-          isVegetarian: true,
-          isVegan: false,
-        },
-        inStock: true,
-      },
-    ],
-    []
-  );
+        isPopular: false,
+        isFavorite: state.favoriteProducts.includes(apiProduct.product_id.toString()),
+        tags: tagIds.map((id) => id.toString()),
+        inStock: apiProduct.stock_status !== false,
+        availableQuantity: undefined,
+        categoryId: parseInt(selectedCategoryIdStr, 10),
+        menuId: undefined,
+      } as Product & { categoryId: number; menuId?: number };
+    });
+  }, [productsData, state.selectedCategoryId, state.favoriteProducts]);
 
   // ========== Initialize with Default Selected Item ==========
   React.useEffect(() => {
@@ -192,12 +193,14 @@ const HomeScreen: React.FC = () => {
     }
   }, [categoryItems, state.selectedCategoryId]);
 
-  // Load products when menu or category changes
+  // Update products when filtered products change
   React.useEffect(() => {
-    if (state.selectedMenuId && state.selectedCategoryId) {
-      setState((prev) => ({ ...prev, products: mockProducts, isLoading: false }));
-    }
-  }, [state.selectedMenuId, state.selectedCategoryId, mockProducts]);
+    setState((prev) => ({
+      ...prev,
+      products: filteredProducts,
+      isLoading: isLoadingProducts,
+    }));
+  }, [filteredProducts, isLoadingProducts]);
 
   // ========== Handlers ==========
   const handleMenuSelect = useCallback((itemId: string) => {
@@ -217,7 +220,17 @@ const HomeScreen: React.FC = () => {
   }, [openDrawer]);
 
   const handleNotificationPress = useCallback(() => {
-    Alert.alert('Notifications', 'No new notifications');
+    setIsNotificationModalVisible(true);
+  }, []);
+
+  const handleNotificationModalClose = useCallback(() => {
+    setIsNotificationModalVisible(false);
+  }, []);
+
+  const handleNotificationItemPress = useCallback((notification: any) => {
+    // Handle notification item press
+    console.log('Notification pressed:', notification);
+    // You can navigate to order details, promo details, etc. based on notification type
   }, []);
 
   const handleProductPress = useCallback((product: Product) => {
@@ -343,6 +356,13 @@ const HomeScreen: React.FC = () => {
         hasNotifications={true}
       />
 
+      {/* Notification Modal */}
+      <NotificationModal
+        isVisible={isNotificationModalVisible}
+        onClose={handleNotificationModalClose}
+        onNotificationPress={handleNotificationItemPress}
+      />
+
       {/* Menu Header */}
       <ErrorBoundary
         onError={(error: Error, stackTrace: string) => {
@@ -386,11 +406,15 @@ const HomeScreen: React.FC = () => {
         FallbackComponent={ErrorFallback}
       >
         <ProductList
-          products={state.products}
+          products={filteredProducts}
           onProductPress={handleProductPress}
           onFavoriteToggle={handleFavoriteToggle}
-          loading={state.isLoading}
-          emptyMessage="No products available for this category"
+          loading={isLoadingProducts || isLoadingMenu}
+          emptyMessage={
+            state.selectedCategoryId
+              ? 'No products available for this category'
+              : 'No products available'
+          }
         />
       </ErrorBoundary>
 

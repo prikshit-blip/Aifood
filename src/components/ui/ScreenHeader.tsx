@@ -72,6 +72,7 @@ const ScreenHeader: React.FC<ScreenHeaderProps> = ({
           styles.headerTitle,
           {
             color: colors.normalText || '#000000',
+            
           },
         ]}
       >
@@ -92,6 +93,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    // iOS shadow
+    // shadowColor: '#000000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 3,
+    // Android shadow
+    elevation: 1,
   } as ViewStyle,
   backButton: {
     width: 40,

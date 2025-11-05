@@ -109,6 +109,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
                 style={{ width: 24, height: 24 }}
                 source={TAB_ICONS[tabName]}
                 resizeMode="contain"
+                tintColor={isFocused ? colors.primary || '#FF6B35' : colors.greyText || '#666666'}
               />
               {/* Cart badge - TODO: Get from cart store/context */}
               {isCart && false && (

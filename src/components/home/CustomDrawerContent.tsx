@@ -40,7 +40,8 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
     return null;
   }
 
-  const isLoggedIn = !!user;
+  const isLoggedIn = user?.name;
+  console.log('isLoggedIn user' , isLoggedIn);
 
   // Common menu items for both logged in and guest
   const commonMenuItems = [
@@ -200,7 +201,7 @@ const CustomDrawerContent: React.FC<CustomDrawerContentProps> = ({
     <View style={styles.container}>
       <DrawerContentScrollView
         {...props}
-        contentContainerStyle={{ paddingHorizontal: 0 }}
+        contentContainerStyle={styles.contentContainer}
       >
         {/* User/Guest Info Section */}
         <View style={styles.headerSection}>

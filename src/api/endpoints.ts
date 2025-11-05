@@ -35,7 +35,7 @@ export const API_ENDPOINTS = {
 
   // Products/Menu Items
   PRODUCTS: {
-    LIST: '/products',
+    LIST: (domain: string) => `https://${domain}/cp/api/store/products`,
     GET_BY_ID: (id: string) => `/products/${id}`,
     SEARCH: '/products/search',
     CATEGORIES: '/products/categories',

@@ -5,9 +5,11 @@ import { ProductCardProps } from '../../types/home';
 import AppText from '../ui/AppText';
 import { getImage, ICONS } from '../../assests';
 import AppImage from '../ui/AppImage';
-import FastImage from 'react-native-fast-image';
+import FastImage, { ImageStyle, Source } from 'react-native-fast-image';
 import AppHeading from '../ui/AppHeading';
 import createStyles from './ProductCard.styles';
+
+
 
 const ProductCard: React.FC<ProductCardProps> = ({
   product,
@@ -68,9 +70,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <View style={styles.content}>
         {/* Product Image */}
         {productImage && (
-          <Image
-            source={productImage}
-            style={styles.image}
+          <FastImage
+            source={productImage as Source}
+            style={styles.image as ImageStyle}
             resizeMode="cover"
           />
         )}
@@ -149,7 +151,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               <FastImage
                 source={product?.isFavorite ? ICONS.heart_fill : ICONS.heart}
                 tintColor={product.isFavorite ? colors?.primary || '#FF4444' : colors.black || '#666666'}
-                style={styles.favoriteIcon}
+                style={styles.favoriteIcon as ImageStyle}
               />
             </TouchableOpacity>
           </View>

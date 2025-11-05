@@ -16,6 +16,8 @@ const DrawerNavigator: React.FC = () => {
   const { colors, spacing, borderRadius } = useTheme();
   const { user } = useAuth();
 
+  console.log('user DrawerNavigator', user);
+
   if (!colors || !spacing || !borderRadius) {
     return null;
   }

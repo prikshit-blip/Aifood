@@ -51,6 +51,7 @@ const createStyles = (
       fontSize: 12,
       color: colors?.lightText || '#666666',
       marginBottom: spacing?.xs || 4,
+      maxWidth: '78%',
     } as TextStyle,
     tag: {
       backgroundColor: '#FFD700',

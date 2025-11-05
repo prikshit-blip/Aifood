@@ -71,6 +71,7 @@ const createStyles = (
       marginHorizontal: 16,
       backgroundColor: colors?.greyBackground || '#F5F5F5',
       marginVertical: spacing?.md || 16,
+      opacity: 1,
     } as ViewStyle,
   });
 

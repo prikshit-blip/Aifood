@@ -92,6 +92,7 @@ const PromosScreen: React.FC = () => {
         )}
       >
         <Suspense
+        
           fallback={
             <ScrollView
               style={styles.suspenseFallbackScrollView}
