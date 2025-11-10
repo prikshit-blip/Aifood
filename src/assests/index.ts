@@ -128,7 +128,7 @@ export const ICONS = {
   bookTable: require('./icons/bookTable.svg'),
   
   // General
-  description: require('./icons/description.svg'),
+  description: require('./icons/document.png'),
   group: require('./icons/Group.svg'),
   frame: require('./icons/Frame 1000002274.svg'),
   rectangle5: require('./icons/Rectangle 5.svg'),
@@ -142,6 +142,7 @@ export const ICONS = {
  * Images exported with type-safe interface
  */
 export const IMAGES = {
+  // placholder: require('./images/placholder.png'),
   // Food Images
   burgerImg: require('./images/burgerImg.png'),
   pizza: require('./images/pizza.png'),

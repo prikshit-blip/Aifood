@@ -16,114 +16,131 @@ const createStyles = (
     } as ViewStyle,
     scrollContent: {
       padding: spacing?.md || 16,
-      paddingBottom: 100, // Space for bottom tab
+      paddingBottom: 180, // Space for bottom tab and button
     } as ViewStyle,
-    title: {
-      fontSize: 28,
+    section: {
+      // marginBottom: spacing?.xl || 32,
+    } as ViewStyle,
+    sectionTitle: {
+      fontSize: 18,
       fontWeight: 'bold',
-      color: colors?.primaryText || '#000000',
-      marginBottom: spacing?.sm || 8,
+      color: colors?.normalText || '#000000',
+      marginBottom: spacing?.md || 16,
     } as TextStyle,
-    description: {
-      fontSize: 14,
-      color: colors?.greyText || '#666666',
-      marginBottom: spacing?.lg || 24,
-    } as TextStyle,
-    giftCard: {
-      backgroundColor: colors?.whiteBackground || '#FFFFFF',
+    // Gift Card Selection Styles
+    giftCardGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    } as ViewStyle,
+    giftCardOption: {
+      width: '48%',
+      aspectRatio: 1,
       borderRadius: borderRadius?.md || 12,
       padding: spacing?.md || 16,
-      marginBottom: spacing?.md || 16,
       borderWidth: 2,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-    } as ViewStyle,
-    giftCardAvailable: {
-      borderColor: colors?.primary || '#FF6B35',
-      opacity: 1,
-    } as ViewStyle,
-    giftCardUnavailable: {
-      borderColor: colors?.greyBackground || '#E0E0E0',
-      opacity: 0.6,
-    } as ViewStyle,
-    giftCardContent: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
+      borderColor: colors?.border || '#E0E0E0',
       alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: spacing?.md || 16,
     } as ViewStyle,
-    giftCardDetails: {
-      flex: 1,
+    giftCardOptionSelected: {
+      borderColor: colors?.primary || '#FF6B35',
     } as ViewStyle,
-    giftCardTitle: {
-      fontSize: 20,
+    giftCardImageContainer: {
+      width: '100%',
+      height: '60%',
+      marginBottom: spacing?.sm || 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+    } as ViewStyle,
+    giftCardImagePlaceholder: {
+      width: 60,
+      height: 60,
+      borderRadius: borderRadius?.sm || 8,
+      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    } as ViewStyle,
+    giftCardOptionText: {
+      fontSize: 14,
       fontWeight: '600',
       color: colors?.primaryText || '#000000',
-      marginBottom: spacing?.xs || 4,
+      textAlign: 'center',
     } as TextStyle,
-    giftCardDescription: {
-      fontSize: 14,
-      color: colors?.greyText || '#666666',
-      marginBottom: spacing?.sm || 8,
+    giftCardOptionTextSelected: {
+      color: colors?.primary || '#FF6B35',
     } as TextStyle,
-    unavailableText: {
-      fontSize: 12,
-      color: colors?.error || '#FF4444',
-      marginTop: spacing?.xs || 4,
-    } as TextStyle,
-    giftCardValue: {
-      backgroundColor: colors?.primary || '#FF6B35',
-      paddingHorizontal: spacing?.md || 16,
-      paddingVertical: spacing?.sm || 8,
-      borderRadius: borderRadius?.sm || 8,
+    // Amount Selection Styles
+    amountInput: {
+      marginBottom: spacing?.md || 16,
     } as ViewStyle,
-    giftCardValueText: {
-      fontSize: 18,
-      fontWeight: '700',
+    predefinedAmountsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    } as ViewStyle,
+    amountButton: {
+      flex: 1,
+      minWidth: '22%',
+      height: 40,
+      borderRadius: borderRadius?.md || 12,
+      
+      backgroundColor: colors?.whiteBackground || '#FFFFFF',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing?.sm || 12,
+      marginRight: spacing?.sm || 12,
+      marginBottom: spacing?.sm || 12,
+    } as ViewStyle,
+    amountButtonSelected: {
+      borderColor: colors?.primary || '#FF6B35',
+      backgroundColor: colors?.primary || '#FF6B35',
+    } as ViewStyle,
+    amountButtonText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors?.normalText || '#000000',
+    } as TextStyle,
+    amountButtonTextSelected: {
       color: colors?.whiteText || '#FFFFFF',
     } as TextStyle,
-    emptyStateContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingVertical: spacing?.xl || 40,
+    // Input Styles
+    inputContainer: {
+      marginBottom: spacing?.md || 16,
     } as ViewStyle,
-    emptyStateText: {
-      fontSize: 16,
-      color: colors?.greyText || '#666666',
-      textAlign: 'center',
-    } as TextStyle,
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: spacing?.md || 16,
-      paddingVertical: spacing?.sm || 12,
-      backgroundColor: colors?.whiteBackground || '#FFFFFF',
-    } as ViewStyle,
-    backButton: {
-      width: 40,
-      height: 40,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: spacing?.xs || 8,
-    } as ViewStyle,
-    backIcon: {
-      width: 24,
-      height: 24,
+    inputIcon: {
+      tintColor:  '#666666',
+      width: 20,
+      height: 20,
     },
-    headerTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: colors?.primaryText || '#000000',
-      flex: 1,
-      textAlign: 'center',
-    } as TextStyle,
-    headerRight: {
-      width: 40,
+    messageInputContainer: {
+      minHeight: 100,
+      alignItems: 'flex-start',
     } as ViewStyle,
+    addToCartButtonContainer: {
+      position: 'absolute',
+      bottom: 80,
+      left: 0,
+      right: 0,
+      paddingHorizontal: spacing?.md || 16,
+      paddingBottom: spacing?.md || 16,
+      paddingTop: spacing?.sm || 8,
+      backgroundColor: colors?.whiteBackground || '#FFFFFF',
+      // borderTopWidth: 1,
+      // borderTopColor: colors?.greyBackground || '#F5F5F5',
+
+    } as ViewStyle,
+    // Add to Cart Button
+    addToCartButton: {
+      
+      margin:0,
+      
+      // height: 50,
+    } as ViewStyle,
+    addToCartButtonText: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      letterSpacing: 1,
+    } as TextStyle,
   });
 
 export default createStyles;

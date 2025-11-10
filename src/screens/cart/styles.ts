@@ -1,4 +1,4 @@
-import { StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, ViewStyle, TextStyle, ImageStyle } from 'react-native';
 import { ThemeColors, ThemeSpacing, ThemeBorderRadius } from '../../store/stores/themeStore';
 
 const createStyles = (
@@ -237,6 +237,18 @@ const createStyles = (
     headerRight: {
       width: 40,
     } as ViewStyle,
+
+    placholderImage: {
+      width: 100,
+      height: 100,
+      borderRadius: borderRadius?.md || 12,
+    } as ImageStyle,
+    EmptyCartContainer:{
+      flex:1,
+      height: '100%',
+      justifyContent:'center',
+      alignItems:'center'
+    } as ViewStyle
   });
 
 export default createStyles;
